@@ -10,9 +10,9 @@ prefixe=compilateur
 # note : le programme principal ne doit surtout pas s'appeler $(prefixe).c
 # (make l'écraserait parce qu'il a une règle "%.c: %.y")
 
-all: main
+all: decaf
 
-main: $(prefixe).tab.o lex.yy.o main.o
+decaf: $(prefixe).tab.o lex.yy.o decaf.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(prefixe).tab.c: $(prefixe).y
