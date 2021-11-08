@@ -11,7 +11,6 @@
 %%
 
 [[:alpha:]]+ {
-    yylval = toupper(yytext[0]);
     return ID;
 }
 
