@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "compilateur.tab.h" 
+#include "compilateur.tab.h"
 %}
 
 %option nounput
