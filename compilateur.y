@@ -9,6 +9,8 @@ void yyerror(const char *msg);
 
 %}
 
+%token SEMICOLON
+
 /* LITERALS */
 %token ID
 %token INT
