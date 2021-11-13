@@ -23,7 +23,7 @@
 \+\= {return ASSIGN_PLUS;}
 \-= {return ASSIGN_SUB;}
 
-[-] {return MOINS;} //TODO : a en parler de la distinction du moins et unaire + on peut le faire sur en une instruction si on modifie les tokens
+[-] {return USUB;} //TODO : a en parler de la distinction du moins et unaire + on peut le faire sur en une instruction si on modifie les tokens
 [+] {return PLUS;}
 [*] {return MULT;}
 [/] {return DIV;}

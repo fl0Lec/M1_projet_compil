@@ -26,13 +26,13 @@ void yyerror(const char *msg);
 %token ASSIGN_SUB
 
 /* OPERATIONS et EXPRESSIONS */
-%token MOINS // unaire
-%token PLUS
-%token SUB
-%token MULT
-%token DIV
-%token MOD
-%token NOT
+%nonassoc USUB // unaire
+%left PLUS
+%left SUB
+%left MULT
+%left DIV
+%left MOD
+%nonassoc NOT
 %token PAR_O
 %token PAR_C
 
@@ -43,16 +43,94 @@ void yyerror(const char *msg);
 %token SUP
 %token EQ
 %token NOT_EQ
-%token OR
-%token AND
+%left OR
+%left AND
 
-%start begin
+%start statement
 
 %%
 
-begin
-:
-| ID begin
+statement
+: 
+| statement location assign_op expr SEMICOLON // TODO statement temporaire
+;
+
+assign_op
+: ASSIGN
+| ASSIGN_PLUS
+| ASSIGN_SUB
+;
+
+location
+: ID
+// | ID '[' expr ']' TODO tableaux
+;
+
+expr
+: location
+// | method_call TODO
+| literal
+| expr bin_op expr
+| USUB expr
+| NOT expr
+| PAR_O expr PAR_C
+;
+
+bin_op
+: arith_op
+| rel_op
+| eq_op
+| cond_op
+;
+
+arith_op
+: PLUS
+| SUB
+| MULT
+| DIV
+| MOD
+;
+
+rel_op
+: INF
+| INF_EQ
+| SUP
+| SUP_EQ
+;
+
+eq_op
+: EQ
+| NOT_EQ
+;
+
+cond_op // TODO courts-cicuits
+: OR
+| AND
+;
+
+literal
+: int_literal
+| char_literal
+| string_literal
+| bool_literal
+;
+
+int_literal
+: INT
+| HEXA
+;
+
+bool_literal
+: TRUE
+| FALSE
+;
+
+char_literal
+: CHAR
+;
+
+string_literal
+: STRING
 ;
 
 
