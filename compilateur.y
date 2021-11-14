@@ -9,6 +9,10 @@ void yyerror(const char *msg);
 
 %}
 
+%define parse.error verbose
+
+%union {int val; char* mot;}
+
 %token SEMICOLON
 
 /* LITERALS */
@@ -45,6 +49,8 @@ void yyerror(const char *msg);
 %token NOT_EQ
 %left OR
 %left AND
+
+%type <mot> ID
 
 %start statement
 
