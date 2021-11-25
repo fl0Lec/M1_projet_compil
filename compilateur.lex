@@ -9,18 +9,21 @@
 %option nounput
 %option noyywrap
 
-CHAR \'[ -!#-&(-[]-~]|"\""|"\'"|"\\"|"\n"|"\t"\' 
+CHAR \'.\' 
 
 %%
 
-[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; return ID;}
 
 [0-9]* {yylval.val = atoi(yytext); return INT;} //TODO : limiter les valeurs entre -2147483648 et 2147483648
-[0][x][0-9a-fA-F]* {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
-{CHAR}* {yylval.mot = yytext; return CHAR;}
+[0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
+{CHAR} {yylval.val = yytext[1]; return CHAR;}
 
-'f''a''l''s''e' {yylval.val = 0; return FALSE;}
-'t''r''u''e' {yylval.val = 1; return TRUE;}
+false {yylval.val = 0; printf("false\n"); return FALSE;}
+true {yylval.val = 1; printf("true\n"); return TRUE;}
+
+[(] {return ACO_O;}
+[)] {return ACO_C;}
+[,] {return COMA;}
 
 \= {return ASSIGN;}
 \+\= {return ASSIGN_PLUS;}
@@ -47,16 +50,17 @@ CHAR \'[ -!#-&(-[]-~]|"\""|"\'"|"\\"|"\n"|"\t"\'
 [&][&] {return AND;}
 
 
-'i''f' ;
-'f''o''r' ;
-'r''e''t''u''r''n' ;
-'b''r''e''a''k' ;
-'c''o''n''t''i''n''u''e' ;
+if {printf("if\n");}
+class {return CLASS;}
+for {printf("for\n");}
+return {printf("return\n");}
+break {printf("break\n");}
+continue {printf("continue\n");}
 
-'i''n''t'
-'b''o''o''l''e''a''n' ;
+int {printf("int\n");}
+boolean {printf("boolean\n");}
 
-
+[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; printf("id\n"); return ID;}
 
 [[:space:]] ;
 

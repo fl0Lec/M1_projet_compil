@@ -17,13 +17,16 @@ void yyerror(const char *msg);
 
 /* LITERALS */
 %token ID
-%token INT
-%token HEXA // ? si on traduit en base 10 en C ou pas
-%token CHAR
-%token STRING
+%token CLASS
+%token INT_TYPE
+%token BOOL_TYPE
+%token <val> INT
+%token <val> HEXA // ? si on traduit en base 10 en C ou pas
+%token <val> CHAR
+%token <mot> STRING
 %token BOOL
-%token FALSE
-%token TRUE
+%token <val> FALSE
+%token <val> TRUE
 
 %token ASSIGN
 %token ASSIGN_PLUS
@@ -39,6 +42,9 @@ void yyerror(const char *msg);
 %nonassoc NOT
 %token PAR_O
 %token PAR_C
+%token ACO_O
+%token ACO_C
+%token COMA
 
 // TODO pas tout de suite
 %token INF_EQ
@@ -51,6 +57,9 @@ void yyerror(const char *msg);
 %left AND
 
 %type <mot> ID
+%type <val> int_literal
+%type <val> char_literal
+%type <val> bool_literal
 
 %start statement
 
@@ -59,6 +68,7 @@ void yyerror(const char *msg);
 statement
 : 
 | statement location assign_op expr SEMICOLON // TODO statement temporaire
+| statement literal
 ;
 
 assign_op
@@ -118,21 +128,21 @@ literal
 : int_literal
 | char_literal
 | string_literal
-| bool_literal
+| bool_literal {printf("BOOL %d\n", $1);}
 ;
 
 int_literal
-: INT
-| HEXA
+: INT {$$ = $1; printf("INT %d %x\n", $$, $$);}
+| HEXA {$$ = $1; printf("HEXA %d %x\n", $$, $$);}
 ;
 
 bool_literal
-: TRUE
-| FALSE
+: TRUE {$$ = $1;}
+| FALSE {$$ = $1;}
 ;
 
 char_literal
-: CHAR
+: CHAR {$$ = $1; printf("CHAR %d %c\n", $$, $$);}
 ;
 
 string_literal
