@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "symTab.h"
 #include "tabD.h"
 extern int yylex();
@@ -72,19 +73,27 @@ void yyerror(const char *msg);
 
 %%
 
-program : CLASS ID ACO_O list_decl statement ACO_C
+program : CLASS ID check_program ACO_O list_decl statement ACO_C
+
+check_program : {
+    //verifie que l'on a bien class Program avant de l'effacer de la pile
+    if (strcmp(yylval.mot, "Program")){
+        fprintf(stderr, "erreur attend class Program recoit %s\n", yylval.mot);
+        exit(-1);
+    }
+}
+;
 
 list_decl :
 | field_decl list_decl
 ;
 
 field_decl : type liste_id SEMICOLON {
-    //printf("type %s : nb id = %d\n",(*$1==INT_T?"int":"boolean"), $2->current);
-    //afficheTD($2);
-    //ajout dans table des symbole
+    //ajout dans table des symboles la liste des identifiants dans liste_id
     for (int i=0; i<$2->current;i++){
-        addST($2->s[i], *$1, 0);
+        addST($2->s[i], *$1);
     }
+    freeTD($2);
 }
 ; 
 

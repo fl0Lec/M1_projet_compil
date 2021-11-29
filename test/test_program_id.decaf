@@ -3,4 +3,6 @@ class Program {
     boolean vrai, faux, oui;
     int cpt;
     int nb;
+
+    nb = 0;
 }

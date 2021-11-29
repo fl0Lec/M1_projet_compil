@@ -5,7 +5,7 @@
 
 #define INIT_SIZE 10
 
-struct tab* initTD()
+struct tab* initTD(void)
 {
     struct tab* t=malloc(sizeof(struct tab*));
     t->s=malloc(INIT_SIZE*sizeof(char*));
@@ -38,4 +38,11 @@ void afficheTD(struct tab* t)
     for (int i=0;i<t->current;i++){
         printf("%s\n", t->s[i]);
     }
+}
+
+void freeTD(struct tab* t){
+    for (int i=0;i<t->current;i++){
+        free(t->s[i]);
+    }
+    free(t->s);
 }
