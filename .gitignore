@@ -3,3 +3,4 @@ decaf
 decaf.o
 lex.yy*
 *o
+out.mips
