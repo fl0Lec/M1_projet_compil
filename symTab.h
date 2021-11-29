@@ -28,8 +28,10 @@ void empilerTab(void);
 void depilerTab();
 
 //ajout une entrer dans la table des symbole
-void addTab(char *id, enum type type, int location);
+void addST(char *id, enum type type, int location);
 
 //cherche dans les tables
-void lookup(char *id);
+void lookupST(char *id);
+
+void afficherST();
 #endif

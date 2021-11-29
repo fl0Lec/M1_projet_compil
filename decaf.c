@@ -6,5 +6,6 @@ int main()
 {
     yydebug = 0; // 1: activer - 0: désactiver
     int r = yyparse();
+    afficherST();
     return r;
 }

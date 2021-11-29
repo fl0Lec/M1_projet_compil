@@ -41,8 +41,6 @@ true {yylval.val = 1; printf("true\n"); return TRUE;}
 [/] {return DIV;}
 [%] {return MOD;}
 [!] {return NOT;}
-[(] {return PAR_O;}
-[)] {return PAR_C;}
 
 [<] {return INF;}
 [<][=] {return INF_EQ;}

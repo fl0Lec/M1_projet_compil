@@ -1,6 +1,8 @@
 %{
 #include <stdio.h>
+#include <string.h>
 #include "symTab.h"
+#include "tabD.h"
 extern int yylex();
 void yyerror(const char *msg);
 
@@ -12,7 +14,7 @@ void yyerror(const char *msg);
 
 %define parse.error verbose
 
-%union {int val; char* mot; enum type *type;}
+%union {int val; char* mot; enum type *type; struct tab* tabID;}
 
 %token SEMICOLON
 
@@ -64,7 +66,7 @@ void yyerror(const char *msg);
 %type <val> bool_literal
 %type <type> type
 
-%type <val> liste_id
+%type <tabID> liste_id
 
 %start program
 
@@ -77,7 +79,12 @@ list_decl :
 ;
 
 field_decl : type liste_id SEMICOLON {
-    printf("type %s : nb id = %d\n",(*$1==INT_T?"int":"boolean"), $2);
+    //printf("type %s : nb id = %d\n",(*$1==INT_T?"int":"boolean"), $2->current);
+    //afficheTD($2);
+    //ajout dans table des symbole
+    for (int i=0; i<$2->current;i++){
+        addST($2->s[i], *$1, 0);
+    }
 }
 ; 
 
@@ -92,8 +99,13 @@ type
 ;
 
 liste_id
-: ID {$$ = 1;}
-| liste_id COMA ID {$$ = $1 +1;}
+: ID {
+    $$=initTD(); 
+    addTD($$, $1, strlen($1));
+    }
+| liste_id COMA ID {
+    addTD($$, $3, strlen($3));
+    }
 ;
 
 assign_op
