@@ -2,7 +2,7 @@ class Program {
     int compteur, val;
     boolean vrai, faux, oui;
     int cpt;
-    int nb;
+    int nb, flo, paul, jack;
 
     nb = 0;
 }

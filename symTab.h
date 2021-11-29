@@ -17,23 +17,22 @@ struct symTab {
     struct ID *tail;
 };
 
-struct symTab symTab;
+struct symTab *symTab;
 
-//initialise symTab la table global
-void initSymTab(void);
 
 //empile un table sur la table global
-void empilerTab(void); 
+void empilerST(void); 
 
 //depile ! a la memoire dynamique
-void depilerTab(void);
+void depilerST(void);
 
 //ajout une entrer dans la table des symbole
 void addST(char *id, enum type type);
 
 //cherche dans les tables
-void lookupST(char *id);
+struct ID* lookupST(char *id);
 
-//afficheST
+//afficheST et ID
+void afficheID(struct ID*);
 void afficherST(void);
 #endif

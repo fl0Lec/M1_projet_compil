@@ -1,4 +1,5 @@
-
+CC=gcc
+CFLAGS=-Wall -g
 prefixe=compilateur
 
 # exige 3 fichiers:
@@ -20,6 +21,9 @@ $(prefixe).tab.c: $(prefixe).y
 
 lex.yy.c: $(prefixe).lex $(prefixe).tab.h
 	flex $(prefixe).lex
+
+%.o : %.c 
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 doc:
 	bison --report=all --report-file=$(prefixe).output \

@@ -7,10 +7,11 @@
 
 struct tab* initTD(void)
 {
-    struct tab* t=malloc(sizeof(struct tab*));
+    struct tab* t=malloc(sizeof(struct tab));
     t->s=malloc(INIT_SIZE*sizeof(char*));
     t->current=0;
     t->max=INIT_SIZE;
+    return t;
 }
 
 void addTD(struct tab* t, char* s, int size)
@@ -20,7 +21,7 @@ void addTD(struct tab* t, char* s, int size)
         t->max*=INIT_SIZE;
     }
     
-    t->s[t->current]=malloc(size*sizeof(char));
+    t->s[t->current]=malloc((size+1)*sizeof(char));
     strcpy(t->s[t->current++], s);
     //printf("add %s %s\n", s, t->s[t->current-1]);
 
