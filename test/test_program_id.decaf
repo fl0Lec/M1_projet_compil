@@ -1,0 +1,7 @@
+class Program {
+    int compteur, val;
+    boolean val;
+    boolean vrai, faux, oui;
+    int cpt;
+    int nb;
+}

@@ -18,12 +18,18 @@ CHAR \'.\'
 [0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
 {CHAR} {yylval.val = yytext[1]; return CHAR;}
 
+int {return INT_TYPE;}
+boolean {return BOOL_TYPE;}
+
 false {yylval.val = 0; printf("false\n"); return FALSE;}
 true {yylval.val = 1; printf("true\n"); return TRUE;}
 
-[(] {return ACO_O;}
-[)] {return ACO_C;}
+[(] {return PAR_O;}
+[)] {return PAR_C;}
+[{] {return ACO_O;}
+[}] {return ACO_C;} 
 [,] {return COMA;}
+[;] {return SEMICOLON;}
 
 \= {return ASSIGN;}
 \+\= {return ASSIGN_PLUS;}
@@ -50,22 +56,21 @@ true {yylval.val = 1; printf("true\n"); return TRUE;}
 [&][&] {return AND;}
 
 
-if {printf("if\n");}
 class {return CLASS;}
+
+if {printf("if\n");}
 for {printf("for\n");}
 return {printf("return\n");}
 break {printf("break\n");}
 continue {printf("continue\n");}
 
-int {printf("int\n");}
-boolean {printf("boolean\n");}
 
-[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; printf("id\n"); return ID;}
+[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; return ID;}
 
 [[:space:]] ;
 
 . {
-    fprintf(stderr, "Caractère illégal (%d)\n", yytext[0]);
+    fprintf(stderr, "Caractère illégal (%d %c)\n", yytext[0], yytext[0]);
 }
 
 %%

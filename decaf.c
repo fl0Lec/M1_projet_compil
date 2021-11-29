@@ -1,3 +1,4 @@
+#include "symTab.h"
 extern int yyparse();
 extern int yydebug; // pour l'option -t (trace) de bison
 

@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "symTab.h"
 extern int yylex();
 void yyerror(const char *msg);
 
@@ -11,7 +12,7 @@ void yyerror(const char *msg);
 
 %define parse.error verbose
 
-%union {int val; char* mot;}
+%union {int val; char* mot; enum type *type;}
 
 %token SEMICOLON
 
@@ -28,6 +29,7 @@ void yyerror(const char *msg);
 %token <val> FALSE
 %token <val> TRUE
 
+/* ASSIGN */
 %token ASSIGN
 %token ASSIGN_PLUS
 %token ASSIGN_SUB
@@ -60,15 +62,38 @@ void yyerror(const char *msg);
 %type <val> int_literal
 %type <val> char_literal
 %type <val> bool_literal
+%type <type> type
 
-%start statement
+%type <val> liste_id
+
+%start program
 
 %%
 
-statement
-: 
-| statement location assign_op expr SEMICOLON // TODO statement temporaire
-| statement literal
+program : CLASS ID ACO_O list_decl statement ACO_C
+
+list_decl :
+| field_decl list_decl
+;
+
+field_decl : type liste_id SEMICOLON {
+    printf("type %s : nb id = %d\n",(*$1==INT_T?"int":"boolean"), $2);
+}
+; 
+
+statement : 
+|location assign_op expr SEMICOLON
+
+;
+
+type 
+: INT_TYPE {*$$ = INT_T;}
+| BOOL_TYPE {*$$ = BOOL_T;}
+;
+
+liste_id
+: ID {$$ = 1;}
+| liste_id COMA ID {$$ = $1 +1;}
 ;
 
 assign_op
@@ -86,7 +111,7 @@ expr
 : location
 // | method_call TODO
 | literal
-| expr bin_op expr
+| expr bin_op expr //shif reduce ici
 | USUB expr
 | NOT expr
 | PAR_O expr PAR_C
@@ -94,19 +119,22 @@ expr
 
 bin_op
 : arith_op
-| rel_op
-| eq_op
-| cond_op
+//| rel_op
+//| eq_op
+//| cond_op
 ;
 
 arith_op
 : PLUS
 | SUB
+/*
 | MULT
 | DIV
 | MOD
+*/
 ;
 
+/*
 rel_op
 : INF
 | INF_EQ
@@ -123,6 +151,7 @@ cond_op // TODO courts-cicuits
 : OR
 | AND
 ;
+*/
 
 literal
 : int_literal
@@ -132,8 +161,8 @@ literal
 ;
 
 int_literal
-: INT {$$ = $1; printf("INT %d %x\n", $$, $$);}
-| HEXA {$$ = $1; printf("HEXA %d %x\n", $$, $$);}
+: INT {$$ = $1;}
+| HEXA {$$ = $1;}
 ;
 
 bool_literal
