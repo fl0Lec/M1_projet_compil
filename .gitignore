@@ -2,3 +2,4 @@ compilateur.tab.*
 decaf
 decaf.o
 lex.yy*
+*o
