@@ -5,4 +5,5 @@ class Program {
     int nb, flo, paul, jack;
 
     nb = 0;
+    cpt = nb;
 }

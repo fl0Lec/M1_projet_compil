@@ -13,7 +13,7 @@ prefixe=compilateur
 
 all: decaf
 
-decaf: $(prefixe).tab.o lex.yy.o decaf.o symTab.o tabD.o
+decaf: $(prefixe).tab.o lex.yy.o decaf.o symTab.o tabD.o genCode.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(prefixe).tab.c: $(prefixe).y

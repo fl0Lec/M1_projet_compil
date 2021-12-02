@@ -2,7 +2,7 @@
 #define __symTab__
 
 //les diffferents type - plus tard string/tableau
-enum type {BOOL_T, INT_T};
+enum type {BOOL_T, INT_T, TEMP,};
 
 struct ID {
     char* id; 
@@ -15,6 +15,7 @@ struct symTab {
     struct symTab *prev;
     struct ID *head;
     struct ID *tail;
+    int nbTemp;
 };
 
 struct symTab *symTab;
@@ -27,7 +28,7 @@ void empilerST(void);
 void depilerST(void);
 
 //ajout une entrer dans la table des symbole
-void addST(char *id, enum type type);
+struct ID* addST(char *id, enum type type);
 
 //cherche dans les tables
 struct ID* lookupST(char *id);

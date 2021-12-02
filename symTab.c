@@ -13,6 +13,9 @@ size_t allignement(enum type t){
     case BOOL_T:
         return 1;
         break;
+    case TEMP :
+        return 4;
+        break;
     default :
         return -1;
         break;
@@ -30,6 +33,9 @@ size_t taille(struct ID* id)
     case BOOL_T:
         return 1;
         break;
+    case TEMP :
+        return 4;
+        break;
     default :
         return -1;
         break;
@@ -41,6 +47,7 @@ void empilerST(void)
     struct symTab* s=malloc(sizeof(struct symTab));
     s->prev=symTab;
     s->head=s->tail=NULL;
+    s->nbTemp=0;
     symTab=s;
 }
 
@@ -58,7 +65,7 @@ void depilerST(void){
 }
 
 //il reste a verifier si déjà present dans la table
-void addST(char *id, enum type type)
+struct ID* addST(char *id, enum type type)
 {
     struct ID *i=symTab->head, *new;
     //verifie si déjà dans table de symbole
@@ -90,6 +97,7 @@ void addST(char *id, enum type type)
     } else{
         symTab->head=symTab->tail=new;
     }
+    return symTab->tail;
 }
 
 struct ID* lookupST(char *id)
@@ -111,7 +119,10 @@ struct ID* lookupST(char *id)
 void afficheID(struct ID* id)
 {
     if (id)
-        printf("id : %s  \ttype : %s \tlocation : %d\n", id->id, (id->type==INT_T?"int":"boolean"), id->location);
+        printf("id : %s  \ttype : %s \tlocation : %d\n", 
+        id->id,
+         (id->type==INT_T?"int":id->type==BOOL_T?"boolean":"temp"),
+          id->location);
     else 
         printf("NULL");
 }

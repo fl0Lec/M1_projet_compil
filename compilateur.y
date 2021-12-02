@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "symTab.h"
+#include "genCode.h"
 #include "tabD.h"
 
 #define WRITE(msg) fwrite(msg, strlen(msg),1, yyout);
@@ -19,7 +20,8 @@ void yyerror(const char *msg);
 
 %define parse.error verbose
 
-%union {int val; char* mot; enum type *type; struct tab* tabID;}
+%union {int val; char* mot; enum type *type; struct tab* tabID; struct ID* id; 
+        enum operation *op;}
 
 %token SEMICOLON
 
@@ -73,11 +75,18 @@ void yyerror(const char *msg);
 
 %type <tabID> liste_id
 
+%type <id> location
+%type <id> expr
+%type <id> literal
+
+%type <op> arith_op
+%type <op> bin_op
+
 %start program
 
 %%
 
-program : CLASS ID check_program ACO_O list_decl statement ACO_C
+program : CLASS ID check_program ACO_O list_decl list_statement ACO_C
 
 check_program : {
     WRITE("#start program");
@@ -102,8 +111,22 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
+list_statement : statement
+| statement list_statement
+;
+
 statement : 
-|location assign_op expr SEMICOLON
+|location assign_op expr SEMICOLON {
+    printf("statement %s %s\n", $1->id, $3->id);
+    if (!$1)
+        printf("location wrong\n");
+    if (!$3)
+        printf("expr wrong\n");
+    else {
+        printf("gencode statement\n");
+        gencode(store, $3->id, NULL, $1->id);
+    }
+}
 
 ;
 
@@ -129,30 +152,40 @@ assign_op
 ;
 
 location
-: ID
+: ID {
+    $$=lookupST($1);
+    if (!$$){//no entry in symbole table
+        fprintf(stderr, "no entry in table for %s\n", $1);
+        exit(-1);
+    }
+    printf("location :");
+    afficheID($$);
+}
 // | ID '[' expr ']' TODO tableaux
 ;
 
 expr
-: location
+: location  {$$=$1;}
 // | method_call TODO
-| literal
-| expr bin_op expr //shif reduce ici
-| USUB expr
-| NOT expr
-| PAR_O expr PAR_C
+| literal   {$$=$1;}
+| expr bin_op expr {//shif reduce ici
+
+}
+| USUB expr {$$=NULL;}
+| NOT expr  {$$=NULL;}
+| PAR_O expr PAR_C  {$$=NULL;}
 ;
 
 bin_op
-: arith_op
+: arith_op {$$=$1;}
 //| rel_op
 //| eq_op
 //| cond_op
 ;
 
 arith_op
-: PLUS
-| SUB
+: PLUS {*$$=add;}
+| SUB {*$$=sub;}
 /*
 | MULT
 | DIV
@@ -180,10 +213,23 @@ cond_op // TODO courts-cicuits
 */
 
 literal
-: int_literal
-| char_literal
-| string_literal
-| bool_literal {printf("BOOL %d\n", $1);}
+: int_literal {
+    struct ID* temp=newtemp();
+    temp->type=INT_T;
+    printf("literal : %s\n", temp->id);
+    afficheID(temp);
+    char buf[10];
+    sprintf(buf, "%d", $1);
+    printf("%s\n\n", buf);
+    gencode(loadimm, buf, NULL, temp->id);
+    $$ = temp;
+    }
+| char_literal {$$=NULL;}
+| string_literal {$$=NULL;}
+| bool_literal {
+    printf("BOOL %d\n", $1); 
+    $$=NULL;
+    }
 ;
 
 int_literal

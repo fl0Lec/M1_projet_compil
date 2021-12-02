@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "symTab.h"
+#include "genCode.h"
 extern int yyparse();
 extern int yydebug; // pour l'option -t (trace) de bison
 extern FILE* yyin;
@@ -17,12 +18,20 @@ int main(int argc, char** argv)
     } else {
         yyout=fopen(argv[2], "w");
     }
+    //initialise table des symboles
     empilerST();
+    initGenCode();
 
     int r = yyparse();
 
 
     afficherST();
+    struct ID* id=newtemp();
+    afficheID(id);
+
+    printf("here\n");
+    afficheGenCode();
     depilerST();
+
     return r;
 }
