@@ -26,10 +26,7 @@ int main(int argc, char** argv)
 
 
     afficherST();
-    struct ID* id=newtemp();
-    afficheID(id);
-
-    printf("here\n");
+    printf("\n");
     afficheGenCode();
     depilerST();
 

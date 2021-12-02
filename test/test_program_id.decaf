@@ -1,9 +1,11 @@
 class Program {
-    int compteur, val;
-    boolean vrai, faux, oui;
-    int cpt;
-    int nb, flo, paul, jack;
-
+    //int compteur, val;
+    //boolean vrai, faux, oui;
+    int cpt, nb;
+    // no work beacuse 2 time nb int nb, flo, paul, jack;
+    // commentaire
     nb = 0;
-    cpt = nb;
+    cpt = nb + 8;
+    cpt = cpt - nb;
+    nb = 'a';
 }

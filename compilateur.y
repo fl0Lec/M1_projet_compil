@@ -117,13 +117,11 @@ list_statement : statement
 
 statement : 
 |location assign_op expr SEMICOLON {
-    printf("statement %s %s\n", $1->id, $3->id);
     if (!$1)
         printf("location wrong\n");
     if (!$3)
         printf("expr wrong\n");
     else {
-        printf("gencode statement\n");
         gencode(store, $3->id, NULL, $1->id);
     }
 }
@@ -158,8 +156,6 @@ location
         fprintf(stderr, "no entry in table for %s\n", $1);
         exit(-1);
     }
-    printf("location :");
-    afficheID($$);
 }
 // | ID '[' expr ']' TODO tableaux
 ;
@@ -169,7 +165,18 @@ expr
 // | method_call TODO
 | literal   {$$=$1;}
 | expr bin_op expr {//shif reduce ici
-
+    struct ID* t=newtemp();
+    switch(*$2){
+        case add:
+        case sub: ;
+            t->type=INT_T;
+            gencode(*$2, $1->id, $3->id, t->id);
+            break;
+        default :
+            ;
+            break;
+    }
+    $$=t;
 }
 | USUB expr {$$=NULL;}
 | NOT expr  {$$=NULL;}
@@ -216,18 +223,21 @@ literal
 : int_literal {
     struct ID* temp=newtemp();
     temp->type=INT_T;
-    printf("literal : %s\n", temp->id);
-    afficheID(temp);
     char buf[10];
     sprintf(buf, "%d", $1);
-    printf("%s\n\n", buf);
     gencode(loadimm, buf, NULL, temp->id);
     $$ = temp;
     }
-| char_literal {$$=NULL;}
+| char_literal {
+    struct ID* temp=newtemp();
+    temp->type=INT_T;
+    char buf[10];
+    sprintf(buf, "%d", $1);
+    gencode(loadimm, buf, NULL, temp->id);
+    $$ = temp;
+    }
 | string_literal {$$=NULL;}
 | bool_literal {
-    printf("BOOL %d\n", $1); 
     $$=NULL;
     }
 ;
@@ -243,7 +253,7 @@ bool_literal
 ;
 
 char_literal
-: CHAR {$$ = $1; printf("CHAR %d %c\n", $$, $$);}
+: CHAR {$$ = $1;}
 ;
 
 string_literal

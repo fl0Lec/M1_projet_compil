@@ -13,7 +13,7 @@ CHAR \'.\'
 
 %%
 
-
+\/\/[^\n]*[\n] ;
 [0-9]* {yylval.val = atoi(yytext); return INT;} //TODO : limiter les valeurs entre -2147483648 et 2147483648
 [0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
 {CHAR} {yylval.val = yytext[1]; return CHAR;}
@@ -35,7 +35,7 @@ true {yylval.val = 1; printf("true\n"); return TRUE;}
 \+\= {return ASSIGN_PLUS;}
 \-= {return ASSIGN_SUB;}
 
-[-] {return USUB;} //TODO : a en parler de la distinction du moins et unaire + on peut le faire sur en une instruction si on modifie les tokens
+[-] {return SUB;} //TODO : a en parler de la distinction du moins et unaire + on peut le faire sur en une instruction si on modifie les tokens
 [+] {return PLUS;}
 [*] {return MULT;}
 [/] {return DIV;}
