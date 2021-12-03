@@ -1,6 +1,10 @@
 #ifndef __tabDynamique__
 #define __tabDynamique__
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 struct tab{
     char** s;
     int current, max; //current size and max

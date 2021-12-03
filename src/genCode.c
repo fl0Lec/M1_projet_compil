@@ -1,7 +1,4 @@
 #include "genCode.h"
-#include<stdio.h> 
-#include<stdlib.h>
-#include<string.h>
 
 struct ID* newtemp(void){
     char f[10]="t", t[9];

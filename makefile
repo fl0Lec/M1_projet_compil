@@ -1,36 +1,37 @@
 CC=gcc
 CFLAGS=-Wall -g
-prefixe=compilateur
 
-# exige 3 fichiers:
-# - $(prefixe).y (fichier bison)
-# - $(prefixe).lex (fichier flex)
-# - main.c (programme principal)
-# construit un exécutable nommé "main"
+src=src/compilateur
+bin=bin/compilateur
+doc=doc/compilateur
 
-# note : le programme principal ne doit surtout pas s'appeler $(prefixe).c
-# (make l'écraserait parce qu'il a une règle "%.c: %.y")
 
 all: decaf
 
-decaf: $(prefixe).tab.o lex.yy.o decaf.o symTab.o tabD.o genCode.o
+decaf: $(bin).tab.o bin/lex.yy.o bin/decaf.o bin/symTab.o bin/tabD.o bin/genCode.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
-$(prefixe).tab.c: $(prefixe).y
-	bison -t -d $(prefixe).y
+$(src).tab.c: $(src).y
+	mkdir -p bin
+	bison -t -d $< -o $@
 
-lex.yy.c: $(prefixe).lex $(prefixe).tab.h
-	flex $(prefixe).lex
+src/lex.yy.c: $(src).lex $(src).tab.h
+	flex $(src).lex
+	mv lex.yy.c src/lex.yy.c
 
-%.o : %.c 
+bin/%.o : src/%.c
+	mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 doc:
-	bison --report=all --report-file=$(prefixe).output \
-		--graph=$(prefixe).dot --output=/dev/null \
-		$(prefixe).y
-	dot -Tpdf < $(prefixe).dot > $(prefixe).pdf
+	mkdir -p doc
+	bison --report=all --report-file=$(doc).output \
+		--graph=$(doc).dot --output=/dev/null \
+		$(src).y
+	dot -Tpdf < $(doc).dot > $(doc).pdf
 
 clean:
-	rm -f *.o $(prefixe).tab.c $(prefixe).tab.h lex.yy.c decaf \
-		$(prefixe).output $(prefixe).dot $(prefixe).pdf
+	rm -rf bin doc decaf src/compilateur.tab.h src/compilateur.tab.c src/lex.yy.c
+
+test: test.sh decaf
+	./test.sh

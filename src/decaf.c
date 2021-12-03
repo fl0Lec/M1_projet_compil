@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include "symTab.h"
 #include "genCode.h"
+
 extern int yyparse();
 extern int yydebug; // pour l'option -t (trace) de bison
 extern FILE* yyin;
@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     }
     yyin=fopen(argv[1], "r");
     if (argc<3){
-        yyout=fopen("out.mips", "w");
+        yyout=fopen("out.asm", "w");
     } else {
         yyout=fopen(argv[2], "w");
     }
@@ -29,6 +29,8 @@ int main(int argc, char** argv)
     printf("\n");
     afficheGenCode();
     depilerST();
-
+    
+    fclose(yyin);
+    fclose(yyout);
     return r;
 }

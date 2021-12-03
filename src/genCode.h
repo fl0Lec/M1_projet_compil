@@ -1,5 +1,6 @@
 #ifndef __genCode__
 #define __gencode__
+
 #include "symTab.h"
 
 enum operation {load, loadimm, store, add, sub, mul, divi};

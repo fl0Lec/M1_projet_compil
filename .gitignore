@@ -1,6 +1,17 @@
+# compiled files
 compilateur.tab.*
 decaf
-decaf.o
-lex.yy*
-*o
-out.mips
+lex.yy.*
+*.o
+
+# output test files
+*.mips
+*.asm
+
+# doc files
+*.dot
+*.output
+*.pdf
+
+# editor files
+.vscode/

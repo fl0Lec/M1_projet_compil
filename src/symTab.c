@@ -1,9 +1,6 @@
 #include "symTab.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
-//sur quelle valeur un type doit être aligner en mémoire
+//sur quelle valeur un type doit être aligné en mémoire
 size_t allignement(enum type t){
     switch (t)
     {
@@ -113,7 +110,7 @@ struct ID* lookupST(char *id)
         }
         s=s->prev;
     }
-    //aucun identifiant trouver
+    //aucun identifiant trouvé
     return 0;
 }
 void afficheID(struct ID* id)

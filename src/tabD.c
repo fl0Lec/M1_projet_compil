@@ -1,7 +1,4 @@
 #include "tabD.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 #define INIT_SIZE 10
 
