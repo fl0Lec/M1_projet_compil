@@ -69,7 +69,7 @@ struct ID* addST(char *id, enum type type)
     while (i){
         if (strcmp(id, i->id)==0){
             afficherST();
-            fprintf(stderr,"erreur identifiant déjà utliser dans se contexte %s\n", id);
+            fprintf(stderr,"erreur identifiant déjà utlisé dans ce contexte %s\n", id);
             exit(-1);
         }
         i=i->next;

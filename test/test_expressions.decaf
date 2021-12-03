@@ -1,11 +1,12 @@
-//Exemple de programme en DECAF
+// test des expressions sans structure de controle
+class Program {
 
-int nombre;
-boolean test;
+    int nombre;
+    boolean test;
 
-nombre = 4;
-nombre += 2;
-nombre = nombre + nombre - nombre;
+    nombre = 4;
+    nombre += 2;
+    nombre = nombre + nombre - nombre;
 
-test = nombre == 6 || nombre != 2 && nombre < 10;
-
+    test = nombre == 6 || nombre != 2 && nombre < 10;
+}
