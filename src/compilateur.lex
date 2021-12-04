@@ -9,15 +9,16 @@
 %option nounput
 %option noyywrap
 
-CHAR \'.\' 
+// TODO plus de caractères (échappement => besoin de convertir en char)
+CHAR [[:alpha:][:digit:]]
 
 %%
 
 \/\/[^\n]*[\n] ;
 [0-9]* {yylval.val = atoi(yytext); return INT;} //TODO : limiter les valeurs entre -2147483648 et 2147483648
 [0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
-{CHAR} {yylval.val = yytext[1]; return CHAR;}
-
+\'{CHAR}\' {yylval.val = yytext[1]; return CHAR;}
+\"{CHAR}*\" {yylval.mot = yytext; return STRING;}
 int {return INT_TYPE;}
 boolean {return BOOL_TYPE;}
 
@@ -40,7 +41,6 @@ true {yylval.val = 1; printf("true\n"); return TRUE;}
 [*] {return MULT;}
 [/] {return DIV;}
 [%] {return MOD;}
-[!] {return NOT;}
 
 [<] {return INF;}
 [<][=] {return INF_EQ;}
@@ -52,6 +52,7 @@ true {yylval.val = 1; printf("true\n"); return TRUE;}
 
 [|][|] {return OR;}
 [&][&] {return AND;}
+[!] {return NOT;}
 
 
 class {return CLASS;}

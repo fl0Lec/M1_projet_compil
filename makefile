@@ -6,13 +6,15 @@ bin=bin/compilateur
 doc=doc/compilateur
 
 
-all: decaf
+all: bin decaf
+
+bin:
+	mkdir bin
 
 decaf: $(bin).tab.o bin/lex.yy.o bin/decaf.o bin/symTab.o bin/tabD.o bin/genCode.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(src).tab.c: $(src).y
-	mkdir -p bin
 	bison -t -d $< -o $@
 
 src/lex.yy.c: $(src).lex $(src).tab.h
@@ -20,7 +22,6 @@ src/lex.yy.c: $(src).lex $(src).tab.h
 	mv lex.yy.c src/lex.yy.c
 
 bin/%.o : src/%.c
-	mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 doc:
