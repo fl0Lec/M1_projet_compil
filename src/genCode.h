@@ -25,3 +25,4 @@ void gencode(enum operation, char* s1, char* s2, char* dst);
 
 void afficheGenCode();
 #endif
+
