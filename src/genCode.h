@@ -1,5 +1,5 @@
 #ifndef __genCode__
-#define __gencode__
+#define __genCode__
 
 #include "symTab.h"
 
