@@ -117,11 +117,15 @@ list_statement : statement
 
 statement : 
 |location assign_op expr SEMICOLON {
+    //verifie que l'on a bien location et expr
     if (!$1)
         printf("location wrong\n");
     if (!$3)
         printf("expr wrong\n");
     else {
+        //reste a faire different assign_op
+
+        //store resultat expr dans location
         gencode(store, $3->id, NULL, $1->id);
     }
 }
@@ -135,10 +139,13 @@ type
 
 liste_id
 : ID {
+    //initialise tableaux dynamique contenue dans liste_id 
+    //ajoute l'identifiant dans le tableaux
     $$=initTD(); 
     addTD($$, $1, strlen($1));
     }
 | liste_id COMA ID {
+    //ajoute l'identifiant dans le tableaux
     addTD($$, $3, strlen($3));
     }
 ;
@@ -152,7 +159,8 @@ assign_op
 location
 : ID {
     $$=lookupST($1);
-    if (!$$){//no entry in symbole table
+    //verification si est dans la table des symboles
+    if (!$$){
         fprintf(stderr, "no entry in table for %s\n", $1);
         exit(-1);
     }
@@ -166,6 +174,7 @@ expr
 | literal   {$$=$1;}
 | expr bin_op expr {//shif reduce ici
     struct ID* t=newtemp();
+    //switch sur les differentes operations binaires
     switch(*$2){
         case add:
         case sub: ;

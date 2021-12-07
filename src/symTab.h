@@ -8,18 +8,19 @@
 //les diffferents type - plus tard string/tableau
 enum type {BOOL_T, INT_T, TEMP,};
 
+//liste chainer d'ID
 struct ID {
-    char* id; 
-    enum type type;
-    int location; //emplacement memoire
-    struct ID* next;
+    char* id;               //identifiant 
+    enum type type;         //type
+    int location;           //emplacement memoire
+    struct ID* next;        //ID suivant
 };
 
 struct symTab {
-    struct symTab *prev;
+    struct symTab *prev;    //table des symboles de "niveau superieur"
     struct ID *head;
-    struct ID *tail;
-    int nbTemp;
+    struct ID *tail;        //pour ajouter ID (toujours à la fin -> O(1))
+    int nbTemp;             //nombre de temporaire deja present dans symTab
 };
 
 struct symTab *symTab;

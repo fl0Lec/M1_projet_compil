@@ -19,7 +19,7 @@ size_t allignement(enum type t){
     }
 
 }
-//taille en memoire d'un identifiant 
+//taille en memoire d'un identifiant ! au tableau plus tard
 size_t taille(struct ID* id)
 {
     switch (id->type)
@@ -90,7 +90,7 @@ struct ID* addST(char *id, enum type type)
         new->location=(((tail->location+taille(tail)+a-1)/a)*a);
         symTab->tail->next=new;
         symTab->tail=new;
-    //premier element
+    //si premier element dans table des symbole actuelle
     } else{
         symTab->head=symTab->tail=new;
     }
@@ -113,6 +113,7 @@ struct ID* lookupST(char *id)
     //aucun identifiant trouvé
     return 0;
 }
+
 void afficheID(struct ID* id)
 {
     if (id)
@@ -123,6 +124,7 @@ void afficheID(struct ID* id)
     else 
         printf("NULL");
 }
+
 void afficherST(void)
 {
     

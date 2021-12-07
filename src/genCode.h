@@ -17,12 +17,17 @@ struct genCode
     int line;
 }genCode;
 
-int nbTemp;
 
+//initialise le tableau gencode (dans decaf.c)
 void initGenCode(void);
+
+//creer un nouveau temporaire et renvoye son entrer dans la table des symboles
 struct ID* newtemp(void);
+
+//genere le code3add et le place dans genCode.
 void gencode(enum operation, char* s1, char* s2, char* dst);
 
+//affiche tous le code generer
 void afficheGenCode();
 #endif
 

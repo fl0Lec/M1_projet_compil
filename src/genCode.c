@@ -2,13 +2,16 @@
 
 struct ID* newtemp(void){
     char f[10]="t", t[9];
+    //verifie si temporaire ou id deja dans table des symboles
     do {
         sprintf(t, "%d", symTab->nbTemp++);
         strcat(f, t);
     } while (lookupST(f));
+    //creer et renvoye temporaire
     return addST(f, TEMP);
 
 }
+
 void initGenCode(void){
     genCode.line=0;
     genCode.size=10;
@@ -16,13 +19,16 @@ void initGenCode(void){
 }
 
 void gencode(enum operation op, char* s1, char* s2, char* dst){
+    //augmente taille genCode si taille max atteinte
     if (genCode.line>=genCode.size-1){
         genCode.size*=2;
         genCode.tab=realloc(genCode.tab, sizeof(struct code3add)*genCode.size);
     }
+    //line contient la dernière ligne non initialiser
     struct code3add *line=genCode.tab+genCode.line++;
     line->op = op;
     line->arg1=line->arg2=line->dst=NULL;
+    //ajout argument seulement si present
     if (s1){
         line->arg1 = malloc(sizeof(char)*strlen(s1));
         strcpy(line->arg1, s1);
