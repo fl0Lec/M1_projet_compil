@@ -9,7 +9,6 @@
 %option nounput
 %option noyywrap
 
-// TODO plus de caractères (échappement => besoin de convertir en char)
 CHAR [[:alpha:][:digit:]]
 
 %%

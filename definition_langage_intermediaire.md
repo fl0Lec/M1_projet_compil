@@ -10,14 +10,16 @@ Chaque ligne est représenté sous forme d'une structure de donnée **code3add**
 les opérateurs arithmétiques sont :
 `{load, loadimm, store, add, sub, mul, divi}`
 
-## load
+la difference entre load et store est que load mets une variable dans un temporaire tandis que store fais l'inverse
 
+## load 
+dst := arg1
 
 ## loadimm
-
+dst := val 
 
 ## store
-
+dst := arg1
 
 ## add
 dst := arg1 + arg2
