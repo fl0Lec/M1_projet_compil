@@ -21,8 +21,8 @@ CHAR [[:alpha:][:digit:]]
 int {return INT_TYPE;}
 boolean {return BOOL_TYPE;}
 
-false {yylval.val = 0; printf("false\n"); return FALSE;}
-true {yylval.val = 1; printf("true\n"); return TRUE;}
+false {return FALSE;}
+true {return TRUE;}
 
 [(] {return PAR_O;}
 [)] {return PAR_C;}
