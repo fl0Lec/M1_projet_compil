@@ -8,7 +8,7 @@ extern FILE* yyout;
 
 int main(int argc, char** argv)
 {
-    yydebug = 0; // 1: activer - 0: désactiver
+    yydebug = 1; // 1: activer - 0: désactiver
     if (argc<2){
         fprintf(stderr, "attend un nom de fichier\n");
     }

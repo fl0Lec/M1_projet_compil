@@ -6,7 +6,6 @@ class Program {
 
     nombre = 4;
     nombre += 2;
-    nombre = nombre + nombre - nombre;
+    nombre = nombre % 2;
 
-    test = nombre == 6 || nombre != 2 && nombre < 10;
 }

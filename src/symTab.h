@@ -6,7 +6,7 @@
 #include <string.h>
 
 //les diffferents type - plus tard string/tableau
-enum type {BOOL_T, INT_T, TEMP,};
+enum type {BOOL_T, INT_T, TEMP};
 
 //liste chainer d'ID
 struct ID {

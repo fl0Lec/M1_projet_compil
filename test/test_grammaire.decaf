@@ -1,10 +1,3 @@
-'a'
-'0'
-15
-0x56
-true 
-false
-if 
-for 
-return
-break
+class Program {
+}
+
