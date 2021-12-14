@@ -11,7 +11,7 @@ all: bin decaf
 bin:
 	mkdir bin
 
-decaf: $(bin).tab.o bin/lex.yy.o bin/decaf.o bin/symTab.o bin/tabD.o bin/genCode.o
+decaf: $(bin).tab.o bin/lex.yy.o bin/decaf.o bin/symTab.o bin/tabD.o bin/genCode.o bin/genMips.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 $(src).tab.c: $(src).y

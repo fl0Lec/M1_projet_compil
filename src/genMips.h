@@ -7,6 +7,8 @@
  * traduit le code 3 adresses en code mips
  * la fonction écrira le code dans le fichier de sorti directement
  */
-void printMips(genCode* code);
+void genMips(FILE* out);
+
+
 #endif
 

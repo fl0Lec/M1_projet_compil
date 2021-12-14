@@ -2,7 +2,7 @@
 #define __genCode__
 
 #include "symTab.h"
-
+#include <string.h>
 enum operation {load, loadimm, store, add, sub, mul, divi};
 
 struct code3add{

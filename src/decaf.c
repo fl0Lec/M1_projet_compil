@@ -1,5 +1,6 @@
 #include "symTab.h"
 #include "genCode.h"
+#include "genMips.h"
 
 extern int yyparse();
 extern int yydebug; // pour l'option -t (trace) de bison
@@ -24,7 +25,7 @@ int main(int argc, char** argv)
 
     int r = yyparse();
 
-
+    genMips(yyout);
     afficherST();
     printf("\n");
     afficheGenCode();

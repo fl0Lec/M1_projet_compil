@@ -89,7 +89,7 @@ void yyerror(const char *msg);
 program : CLASS ID check_program ACO_O list_decl list_statement ACO_C
 
 check_program : {
-    WRITE("#start program");
+    WRITE("#start program\n");
     //verifie que l'on a bien class Program avant de l'effacer de la pile
     if (strcmp(yylval.mot, "Program")){
         fprintf(stderr, "erreur attend class Program recoit %s\n", yylval.mot);
