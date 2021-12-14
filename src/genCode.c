@@ -18,7 +18,7 @@ void initGenCode(void){
     genCode.tab=malloc(genCode.size*sizeof(struct code3add));
 }
 
-void gencode(enum operation op, char* s1, char* s2, char* dst){
+void gencode(enum Operation op, char* s1, char* s2, char* dst){
     //augmente taille genCode si taille max atteinte
     if (genCode.line>=genCode.size-1){
         genCode.size*=2;

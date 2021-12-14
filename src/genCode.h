@@ -2,11 +2,12 @@
 #define __genCode__
 
 #include "symTab.h"
-#include <string.h>
-enum operation {load, loadimm, store, add, sub, mul, divi};
+
+
+enum Operation {load, loadimm, store, add, sub, mul, divi, mod};
 
 struct code3add{
-    enum operation op;
+    enum Operation op;
     char *arg1, *arg2, *dst;
 };
 
@@ -25,7 +26,7 @@ void initGenCode(void);
 struct ID* newtemp(void);
 
 //genere le code3add et le place dans genCode.
-void gencode(enum operation, char* s1, char* s2, char* dst);
+void gencode(enum Operation, char* s1, char* s2, char* dst);
 
 //affiche tous le code generer
 void afficheGenCode();

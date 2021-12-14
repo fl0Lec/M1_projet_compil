@@ -20,8 +20,14 @@ void yyerror(const char *msg);
 
 %define parse.error verbose
 
-%union {int val; char* mot; enum type *type; struct tab* tabID; struct ID* id; 
-        enum operation *op;}
+%code requires{
+    #include "symTab.h"
+    #include "genCode.h"
+    #include "tabD.h"
+}
+
+%union {int val; char* mot; enum type type; struct tab* tabID; struct ID* id; 
+        enum Operation op;}
 
 %token SEMICOLON
 
@@ -105,7 +111,7 @@ list_decl :
 field_decl : type liste_id SEMICOLON {
     //ajout dans table des symboles la liste des identifiants dans liste_id
     for (int i=0; i<$2->current;i++){
-        addST($2->s[i], *$1);
+        addST($2->s[i], $1);
     }
     freeTD($2);
 }
@@ -133,8 +139,8 @@ statement :
 ;
 
 type 
-: INT_TYPE {*$$ = INT_T;}
-| BOOL_TYPE {*$$ = BOOL_T;}
+: INT_TYPE {$$ = INT_T;}
+| BOOL_TYPE {$$ = BOOL_T;}
 ;
 
 liste_id
@@ -175,14 +181,28 @@ expr
 | expr bin_op expr {//shif reduce ici
     struct ID* t=newtemp();
     //switch sur les differentes operations binaires
-    switch(*$2){
+    switch($2){
         case add:
-        case sub: ;
             t->type=INT_T;
-            gencode(*$2, $1->id, $3->id, t->id);
+            gencode($2, $1->id, $3->id, t->id);
+            break;
+        case sub:
+            t->type=INT_T;
+            gencode($2, $1->id, $3->id, t->id);
+            break;
+        case mul:
+            t->type=INT_T;
+            gencode($2, $1->id, $3->id, t->id);
+            break;
+        case divi:
+            t->type=INT_T;
+            gencode($2, $1->id, $3->id, t->id);
+            break;
+        case mod:
+            t->type=INT_T;
+            gencode($2, $1->id, $3->id, t->id);
             break;
         default :
-            ;
             break;
     }
     $$=t;
@@ -200,13 +220,11 @@ bin_op
 ;
 
 arith_op
-: PLUS {*$$=add;}
-| SUB {*$$=sub;}
-/*
-| MULT
-| DIV
-| MOD
-*/
+: PLUS {$$=add;}
+| SUB {$$=sub;}
+| MULT {$$=mul;}
+| DIV {$$=divi;}
+| MOD {$$=mod;}
 ;
 
 /*
