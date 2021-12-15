@@ -83,6 +83,9 @@ void genMips(FILE* out)
             case divi: 
                 genDivi(instr, out);
             break;
+            case mod: 
+                genMod(instr, out);
+            break;
             default:
                 fprintf(stderr, "operation non reconnue\n");
             break;

@@ -46,7 +46,7 @@ void gencode(enum Operation op, char* s1, char* s2, char* dst){
 void affiche3add(struct code3add *line){
     printf("op : %s\t arg1 : %s\t arg2 : %s\t dst : %s\n",
     line->op==load?"load":line->op==loadimm?"loadimm":line->op==store?"store":
-    line->op==add?"add":line->op==sub?"sub":"autre",
+    line->op==add?"add":line->op==sub?"sub":line->op==mod?"mod":"autre",
     (line->arg1?line->arg1:"NULL"),
     (line->arg2?line->arg2:"NULL"),
     (line->dst?line->dst:"NULL")
