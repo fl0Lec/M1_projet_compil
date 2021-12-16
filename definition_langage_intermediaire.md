@@ -33,6 +33,8 @@ dst := arg1 * arg2
 ## divi
 dst := arg1 / arg2
 
+## mod
+dst := arg1 % arg2
 
 # opérations de controle
 
@@ -60,7 +62,7 @@ goto dst if arg1 > arg2
 goto dst if arg1 >= arg2
 
 
-## goto
+## goto_op
 goto dst
 
 

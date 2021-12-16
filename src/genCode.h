@@ -4,7 +4,8 @@
 #include "symTab.h"
 
 
-enum Operation {load, loadimm, store, add, sub, mul, divi, mod};
+enum Operation {load, loadimm, store, add, sub, mul, divi, mod,
+                eq, inf, infeq, sup, supeq, goto_op};
 
 struct code3add{
     enum Operation op;

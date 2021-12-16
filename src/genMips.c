@@ -52,6 +52,36 @@ void genMod(struct code3add instr, FILE* out)
     fprintf(out, "mfhi %s\n", instr.dst);
 }
 
+void genEq(struct code3add instr, FILE* out)
+{
+    
+}
+
+void genInf(struct code3add instr, FILE* out)
+{
+    
+}
+
+void genInfeq(struct code3add instr, FILE* out)
+{
+    
+}
+
+void genSup(struct code3add instr, FILE* out)
+{
+    
+}
+
+void genSupeq(struct code3add instr, FILE* out)
+{
+    
+}
+
+void genGoto(struct code3add instr, FILE* out)
+{
+    
+}
+
 // --------------------------------------
 void genMips(FILE* out)
 {
@@ -85,6 +115,24 @@ void genMips(FILE* out)
             break;
             case mod: 
                 genMod(instr, out);
+            break;
+            case eq: 
+                genEq(instr, out);
+            break;
+            case inf: 
+                genInf(instr, out);
+            break;
+            case infeq: 
+                genInfeq(instr, out);
+            break;
+            case sup: 
+                genSup(instr, out);
+            break;
+            case supeq: 
+                genSupeq(instr, out);
+            break;
+            case goto_op: 
+                genGoto(instr, out);
             break;
             default:
                 fprintf(stderr, "operation non reconnue\n");
