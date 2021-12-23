@@ -1,3 +1,7 @@
 class Program {
+
+	int string;
+	string = '\n';
+
 }
 

@@ -16,8 +16,14 @@ CHAR [[:alpha:][:digit:]]
 \/\/[^\n]*[\n] ;
 [0-9]* {yylval.val = atoi(yytext); return INT;} //TODO : limiter les valeurs entre -2147483648 et 2147483648
 [0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
-\'{CHAR}\' {yylval.val = yytext[1]; return CHAR;}
-\"{CHAR}*\" {yylval.mot = yytext; return STRING;}
+\'{CHAR}\' {yylval.val = (int) yytext[1]; return CHAR;}
+\"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {yylval.mot = yytext; return STRING;}
+\'\\\"\' {yylval.val = (int) yytext[1]; return CHAR;}
+\'\\\'\' {yylval.val = (int) yytext[1]; return CHAR;}
+\'\\\\\' {yylval.val = (int) yytext[1]; return CHAR;}
+\'\\[t]\' {yylval.val = (int) yytext[1]; return CHAR;}
+\'\\[n]\' {yylval.val = (int) yytext[1]; return CHAR;}
+
 int {return INT_TYPE;}
 boolean {return BOOL_TYPE;}
 
@@ -56,11 +62,16 @@ true {return TRUE;}
 
 class {return CLASS;}
 
+
 if {printf("if\n");}
 for {printf("for\n");}
 return {printf("return\n");}
 break {printf("break\n");}
 continue {printf("continue\n");}
+else {printf("else\n");} 
+void {printf("void\n");}
+
+
 
 
 [[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; return ID;}
