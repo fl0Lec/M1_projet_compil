@@ -17,8 +17,27 @@ int main(int argc, char** argv)
     if (argc<3){
         yyout=fopen("out.asm", "w");
     } else {
-        yyout=fopen(argv[2], "w");
+        //Arguments
+        for (int i = 2; i < argc; i++) //pas sûr de faire commencer i à 2
+        {
+            if(strcmp(argv[i],"-version") == 0)
+            {
+                printf("Menbres :\n");
+                printf("Antoine DUMOULIN, Antoine PIERRE, Mickaël DA SILVA Florent LECOULTRE\n");
+            }
+            if(strcmp(argv[i],"-tos") == 0)
+            {
+                printf("BOUCHON : afficher la table des symboles\n");
+            }
+
+            if(strcmp(argv[i], "-o") == 0)
+            {
+                printf("Ecriture du code dans les fichier %s\n", argv[i+1]);
+                yyout=fopen(argv[i+1], "w");
+            }
+        }
     }
+    
     //initialise table des symboles
     empilerST();
     initGenCode();
