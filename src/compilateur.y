@@ -26,7 +26,7 @@ void yyerror(const char *msg);
     #include "tabD.h"
 }
 
-%union {int val; char* mot; enum type type; struct tab* tabID; struct ID* id; 
+%union {int val; char* mot; enum type type; struct tab* tabID; struct symbole* id; 
         enum Operation op;}
 
 %token SEMICOLON
@@ -111,7 +111,7 @@ list_decl :
 field_decl : type liste_id SEMICOLON {
     //ajout dans table des symboles la liste des identifiants dans liste_id
     for (int i=0; i<$2->current;i++){
-        addST($2->s[i], $1);
+        addST_id($2->s[i], $1);
     }
     freeTD($2);
 }
@@ -179,27 +179,27 @@ expr
 // | method_call TODO
 | literal   {$$=$1;}
 | expr bin_op expr {//shif reduce ici
-    struct ID* t=newtemp();
+    struct symbole* t=newtemp();
     //switch sur les differentes operations binaires
     switch($2){
         case add:
-            t->type=INT_T;
+            t->type.type=INT_T;
             gencode($2, $1->id, $3->id, t->id);
             break;
         case sub:
-            t->type=INT_T;
+            t->type.type=INT_T;
             gencode($2, $1->id, $3->id, t->id);
             break;
         case mul:
-            t->type=INT_T;
+            t->type.type=INT_T;
             gencode($2, $1->id, $3->id, t->id);
             break;
         case divi:
-            t->type=INT_T;
+            t->type.type=INT_T;
             gencode($2, $1->id, $3->id, t->id);
             break;
         case mod:
-            t->type=INT_T;
+            t->type.type=INT_T;
             gencode($2, $1->id, $3->id, t->id);
             break;
         default :
@@ -248,16 +248,16 @@ cond_op // TODO courts-cicuits
 
 literal
 : int_literal {
-    struct ID* temp=newtemp();
-    temp->type=INT_T;
+    struct symbole* temp=newtemp();
+    temp->type.type=INT_T;
     char buf[10];
     sprintf(buf, "%d", $1);
     gencode(loadimm, buf, NULL, temp->id);
     $$ = temp;
     }
 | char_literal {
-    struct ID* temp=newtemp();
-    temp->type=INT_T;
+    struct symbole* temp=newtemp();
+    temp->type.type=INT_T;
     char buf[10];
     sprintf(buf, "%d", $1);
     gencode(loadimm, buf, NULL, temp->id);

@@ -5,22 +5,34 @@
 #include <stdio.h>
 #include <string.h>
 
-//les diffferents type - plus tard string/tableau
-enum type {BOOL_T, INT_T, TEMP};
+//les diffferents type
+//TODO string 
+enum type {BOOL_T, INT_T, VOID, TEMP};
+
+//descripteur de fonction
+struct fundesc {
+    int nbArg;          //nombre d'argument
+    enum type* args;    //tableau des argument
+    enum type ret;      //valeur de retour
+};
 
 //liste chainer d'ID
-struct ID {
-    char* id;               //identifiant 
-    enum type type;         //type
-    int location;           //emplacement memoire
-    struct ID* next;        //ID suivant
+struct symbole {
+    enum {TEMPO, IDENT, TAB, FUN} kind;
+    char* id;           //identifiant (variable, tableau, ou fonction)
+    union {
+        struct fundesc desc;
+        enum type type;
+    } type;
+    //int location;           //emplacement memoire (comment faire pour fonction ? -1 ?)
 };
 
 struct symTab {
     struct symTab *prev;    //table des symboles de "niveau superieur"
-    struct ID *head;
-    struct ID *tail;        //pour ajouter ID (toujours à la fin -> O(1))
-    int nbTemp;             //nombre de temporaire deja present dans symTab
+    size_t size;            //taille actuelle de la symtab
+    size_t capacity;        //taille en mémoire
+    size_t nbTemp;          //nombre de temporaire deja present dans symTab
+    struct symbole* symb;   //tableau des symboles
 };
 
 struct symTab *symTab;
@@ -33,12 +45,29 @@ void empilerST(void);
 void depilerST(void);
 
 //ajout une entrée dans la table des symbole
-struct ID* addST(char *id, enum type type);
+struct symbole* addST_id(char *id, enum type type);
+struct symbole* addST_fun(char *id, enum type type);
+struct symbole* addST_temp();
 
 //cherche dans les tables
-struct ID* lookupST(char *id);
+struct symbole* lookupST(char *id);
 
 //afficheST et ID
-void afficheID(struct ID*);
+void afficheSymb(struct symbole*);
 void afficherST(void);
+
+
+static char * const kind_names[] = {
+    [TEMPO] = "temp",
+	[IDENT] = "variable",
+	[TAB] = "tableau",
+	[FUN] = "fonction"
+};
+
+static char * const type_names[] = {
+	[INT_T] = "int",
+	[BOOL_T] = "boolean",
+	[VOID] = "void",
+    [TEMP] = "temp"
+};
 #endif

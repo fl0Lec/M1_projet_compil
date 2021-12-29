@@ -24,7 +24,7 @@ struct genCode
 void initGenCode(void);
 
 //creer un nouveau temporaire et renvoye son entrer dans la table des symboles
-struct ID* newtemp(void);
+struct symbole* newtemp(void);
 
 //genere le code3add et le place dans genCode.
 void gencode(enum Operation, char* s1, char* s2, char* dst);

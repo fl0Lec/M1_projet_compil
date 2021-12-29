@@ -1,5 +1,5 @@
 #include "symTab.h"
-
+#define TAILLE_INIT 64
 //sur quelle valeur un type doit être aligné en mémoire
 size_t allignement(enum type t){
     switch (t)
@@ -20,9 +20,9 @@ size_t allignement(enum type t){
 
 }
 //taille en memoire d'un identifiant ! au tableau plus tard
-size_t taille(struct ID* id)
+size_t taille(struct symbole* id)
 {
-    switch (id->type)
+    switch (id->type.type)
     {
     case INT_T:
         return 4;
@@ -39,99 +39,92 @@ size_t taille(struct ID* id)
     }
 }
 
+
+void checksize(struct symTab* s){
+    if (s->size==s->capacity){
+        s->capacity*=2;
+        s->symb=realloc(s->symb, sizeof(struct symbole)*s->capacity);
+    }
+}
+/////////////////////////////////////////////////////////////
 void empilerST(void)
 {
     struct symTab* s=malloc(sizeof(struct symTab));
     s->prev=symTab;
-    s->head=s->tail=NULL;
+    s->size=0;
+    s->capacity=TAILLE_INIT;
+    s->symb=malloc(sizeof(struct symbole)*TAILLE_INIT);
     s->nbTemp=0;
     symTab=s;
 }
 
+//TODO peut être ne pas liberer la memoire mais garder la table plus tard pour la generation de code ?
 void depilerST(void){
-    struct ID* i=symTab->head, *prev;
-    while (i){
-        prev=i;
-        i=i->next;
-        free(prev->id);
-        free(prev);
-    }
     struct symTab *s=symTab;
+    //TODO liberer memoire quand fonction
     symTab=symTab->prev;
+    free(s->symb);
     free(s);
 }
 
 //il reste a verifier si déjà present dans la table
-struct ID* addST(char *id, enum type type)
+struct symbole* addST_id(char *id, enum type type)
 {
-    struct ID *i=symTab->head, *new;
-    //verifie si déjà dans table de symbole
-    while (i){
-        if (strcmp(id, i->id)==0){
-            afficherST();
-            fprintf(stderr,"erreur identifiant déjà utlisé dans ce contexte %s\n", id);
-            exit(-1);
-        }
-        i=i->next;
-    }
-    //preparer le nouveau id
-    new = malloc(sizeof(struct ID));
-    new->next = NULL;
-    new->id = malloc((strlen(id)+1)*sizeof(char));
-    strcpy(new->id, id);
-    new->type = type;
-    new->location = 0;
-    //la liste existe déjà
-    
-    if (symTab->tail){
-        //position par rapport a eip
-        struct ID* tail = symTab->tail;
-        size_t a = allignement(type);
-        new->location=(((tail->location+taille(tail)+a-1)/a)*a);
-        symTab->tail->next=new;
-        symTab->tail=new;
-    //si premier element dans table des symbole actuelle
-    } else{
-        symTab->head=symTab->tail=new;
-    }
-    return symTab->tail;
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=IDENT;
+    s->id=malloc(sizeof(char)*strlen(id));
+    strcpy(s->id, id);
+    s->type.type=type;
+    return s; 
 }
 
-struct ID* lookupST(char *id)
+struct symbole* addST_temp()
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=TEMPO;
+    s->id=malloc(sizeof(char)*(1+sizeof(size_t)));
+    s->id[0]='t';
+    sprintf(s->id+1, "%ld", symTab->nbTemp++);
+    return s; 
+}
+
+struct symbole* lookupST(char *id)
 {
     struct symTab *s=symTab;
-    struct ID* i;
+    size_t i=0;
     while (s){
-        i=s->head;
-        while (i){
-            if (strcmp(i->id, id)==0)
-                return i;
-            i=i->next;
-        }
-        s=s->prev;
+        for (i=0; i<s->size && strcmp(s->symb[i].id, id)!=0; i++) ;
+        if (i<s->size)
+            return &(symTab->symb[i]);
+        else 
+            s=s->prev;
     }
     //aucun identifiant trouvé
-    return 0;
+    return NULL;
 }
 
-void afficheID(struct ID* id)
+void afficheSymb(struct symbole* s)
 {
-    if (id)
-        printf("id : %s  \ttype : %s \tlocation : %d\n", 
-        id->id,
-         (id->type==INT_T?"int":id->type==BOOL_T?"boolean":"temp"),
-          id->location);
-    else 
-        printf("NULL");
+    printf("id : %s | kind : %s | type :", s->id, kind_names[s->kind]);
+    switch (s->kind)
+    {
+    case TEMPO:
+    case IDENT:
+    case TAB:
+        printf("%s", type_names[s->type.type]);
+        break;
+    case FUN:
+        //TODO
+        printf("TODO");
+    break;
+    }
+    printf("\n");
 }
 
 void afficherST(void)
 {
-    
-    printf("symb tab\n");
-    struct ID *i=symTab->head;
-    while (i){
-        afficheID(i);
-        i=i->next;
-    }
+    for (size_t i=0; i<symTab->size; i++)
+        afficheSymb(&(symTab->symb[i]));
 }

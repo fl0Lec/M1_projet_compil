@@ -1,24 +1,19 @@
 #include "genCode.h"
 
-struct ID* newtemp(void){
-    char f[10]="t", t[9];
-    //verifie si temporaire ou id deja dans table des symboles
-    do {
-        sprintf(t, "%d", symTab->nbTemp++);
-        strcat(f, t);
-    } while (lookupST(f));
-    //creer et renvoye temporaire
-    return addST(f, TEMP);
-
+struct symbole* newtemp(void)
+{
+    return addST_temp();
 }
 
-void initGenCode(void){
+void initGenCode(void)
+{
     genCode.line=0;
     genCode.size=10;
     genCode.tab=malloc(genCode.size*sizeof(struct code3add));
 }
 
-void gencode(enum Operation op, char* s1, char* s2, char* dst){
+void gencode(enum Operation op, char* s1, char* s2, char* dst)
+{
     //augmente taille genCode si taille max atteinte
     if (genCode.line>=genCode.size-1){
         genCode.size*=2;
@@ -43,7 +38,8 @@ void gencode(enum Operation op, char* s1, char* s2, char* dst){
     }
 }
 
-void affiche3add(struct code3add *line){
+void affiche3add(struct code3add *line)
+{
     printf("op : %s\t arg1 : %s\t arg2 : %s\t dst : %s\n",
     line->op==load?"load":line->op==loadimm?"loadimm":line->op==store?"store":
     line->op==add?"add":line->op==sub?"sub":line->op==mod?"mod":"autre",
@@ -53,7 +49,8 @@ void affiche3add(struct code3add *line){
     );
 }
 
-void afficheGenCode(){
+void afficheGenCode()
+{
     printf("gencode nb line : %d\n", genCode.line);
     struct code3add* line=genCode.tab;
     for (; line<genCode.tab+genCode.line; line++){
