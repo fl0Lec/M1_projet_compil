@@ -73,8 +73,8 @@ struct symbole* addST_id(char *id, enum type type)
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=IDENT;
-    s->id=malloc(sizeof(char)*strlen(id));
-    strcpy(s->id, id);
+    s->u.id=malloc(sizeof(char)*strlen(id));
+    strcpy(s->u.id, id);
     s->type.type=type;
     return s; 
 }
@@ -84,10 +84,31 @@ struct symbole* addST_temp()
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=TEMPO;
-    s->id=malloc(sizeof(char)*(1+sizeof(size_t)));
-    s->id[0]='t';
-    sprintf(s->id+1, "%ld", symTab->nbTemp++);
+    s->u.id=malloc(sizeof(char)*(1+sizeof(size_t)));
+    s->u.id[0]='t';
+    sprintf(s->u.id+1, "%ld", symTab->nbTemp++);
     return s; 
+}
+
+struct symbole* addST_constInt(int val, enum type type)
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=CST_INT;
+    s->u.val=val;
+    s->type.type=type;
+    return s;
+}
+
+struct symbole* addST_constStr(char* val)
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=CST_STR;
+    s->u.str=malloc(sizeof(char)*strlen(val)+1);
+    strcpy(s->u.str, val);
+    s->type.type=STRING_T;
+    return s;
 }
 
 struct symbole* lookupST(char *id)
@@ -95,7 +116,7 @@ struct symbole* lookupST(char *id)
     struct symTab *s=symTab;
     size_t i=0;
     while (s){
-        for (i=0; i<s->size && strcmp(s->symb[i].id, id)!=0; i++) ;
+        for (i=0; i<s->size && strcmp(s->symb[i].u.id, id)!=0; i++) ;
         if (i<s->size)
             return &(symTab->symb[i]);
         else 
@@ -107,7 +128,8 @@ struct symbole* lookupST(char *id)
 
 void afficheSymb(struct symbole* s)
 {
-    printf("id : %s | kind : %s | type :", s->id, kind_names[s->kind]);
+    if (s->kind!=CST_INT && s->kind!=CST_STR)
+        printf("id : %s | kind : %s | type :", s->u.id, kind_names[s->kind]);
     switch (s->kind)
     {
     case TEMPO:
@@ -115,10 +137,16 @@ void afficheSymb(struct symbole* s)
     case TAB:
         printf("%s", type_names[s->type.type]);
         break;
+    case CST_INT:
+        printf("const int | val : %d", s->u.val);
+        break;
+    case CST_STR:
+        printf("const str | mot :%s", s->u.str);
+        break;
     case FUN:
         //TODO
         printf("TODO");
-    break;
+        break;
     }
     printf("\n");
 }

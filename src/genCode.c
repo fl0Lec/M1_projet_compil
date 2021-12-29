@@ -1,5 +1,5 @@
 #include "genCode.h"
-
+#define SIZE_INIT 64
 struct symbole* newtemp(void)
 {
     return addST_temp();
@@ -7,53 +7,62 @@ struct symbole* newtemp(void)
 
 void initGenCode(void)
 {
-    genCode.line=0;
-    genCode.size=10;
-    genCode.tab=malloc(genCode.size*sizeof(struct code3add));
+    genCode.size=0;
+    genCode.capacity=SIZE_INIT;
+    genCode.tab=malloc(genCode.capacity*sizeof(struct code3add));
 }
 
-void gencode(enum Operation op, char* s1, char* s2, char* dst)
+void gencode(enum Operation op, struct symbole* s1, struct symbole* s2, struct symbole* dst)
 {
     //augmente taille genCode si taille max atteinte
-    if (genCode.line>=genCode.size-1){
-        genCode.size*=2;
-        genCode.tab=realloc(genCode.tab, sizeof(struct code3add)*genCode.size);
+    if (genCode.size==genCode.capacity){
+        genCode.capacity*=2;
+        genCode.tab=realloc(genCode.tab, sizeof(struct code3add)*genCode.capacity);
     }
     //line contient la dernière ligne non initialiser
-    struct code3add *line=genCode.tab+genCode.line++;
+    struct code3add *line=&(genCode.tab[genCode.size++]);
     line->op = op;
     line->arg1=line->arg2=line->dst=NULL;
     //ajout argument seulement si present
-    if (s1){
-        line->arg1 = malloc(sizeof(char)*strlen(s1));
-        strcpy(line->arg1, s1);
+    line->arg1=s1;
+    line->arg2=s2;
+    line->dst=dst;
+}
+
+void resumeSYmbole(struct symbole* s)
+{
+    if (!s){
+        printf("(null)");
+        return;
     }
-    if (s2){
-        line->arg2 = malloc(sizeof(char)*strlen(s2));
-        strcpy(line->arg2, s2);
-    }
-    if (dst){
-        line->dst = malloc(sizeof(char)*strlen(dst));
-        strcpy(line->dst, dst);
+    switch (s->kind)
+    {
+    case CST_INT:
+        printf("%d", s->u.val);
+        break;
+    case CST_STR:
+        printf("str:%s",s->u.str);
+    default:
+        printf("%s", s->u.id);
+        break;
     }
 }
 
 void affiche3add(struct code3add *line)
 {
-    printf("op : %s\t arg1 : %s\t arg2 : %s\t dst : %s\n",
-    line->op==load?"load":line->op==loadimm?"loadimm":line->op==store?"store":
-    line->op==add?"add":line->op==sub?"sub":line->op==mod?"mod":"autre",
-    (line->arg1?line->arg1:"NULL"),
-    (line->arg2?line->arg2:"NULL"),
-    (line->dst?line->dst:"NULL")
-    );
+    printf("op : %s\targ1 : ",op_names[line->op]);
+    resumeSYmbole(line->arg1);
+    printf("\targ2 : ");
+    resumeSYmbole(line->arg2);
+    printf("\tdst : ");
+    resumeSYmbole(line->dst);
+    printf("\n");
 }
 
 void afficheGenCode()
 {
-    printf("gencode nb line : %d\n", genCode.line);
-    struct code3add* line=genCode.tab;
-    for (; line<genCode.tab+genCode.line; line++){
-        affiche3add(line);
+    printf("gencode nb line : %d\n", genCode.size);
+    for (size_t i=0; i<genCode.size; i++){
+        affiche3add(&(genCode.tab[i]));
     }
 }

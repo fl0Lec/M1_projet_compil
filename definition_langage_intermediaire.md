@@ -11,6 +11,7 @@ les opérateurs arithmétiques sont :
 `{load, loadimm, store, add, sub, mul, divi}`
 
 la difference entre load et store est que load mets une variable dans un temporaire tandis que store fais l'inverse
+attention les argument peuvent aussi être des constante
 
 ## load 
 dst := arg1

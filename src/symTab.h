@@ -7,7 +7,7 @@
 
 //les diffferents type
 //TODO string 
-enum type {BOOL_T, INT_T, VOID, TEMP};
+enum type {BOOL_T, INT_T, STRING_T, VOID, TEMP};
 
 //descripteur de fonction
 struct fundesc {
@@ -18,8 +18,13 @@ struct fundesc {
 
 //liste chainer d'ID
 struct symbole {
-    enum {TEMPO, IDENT, TAB, FUN} kind;
-    char* id;           //identifiant (variable, tableau, ou fonction)
+    enum  {TEMPO, IDENT, TAB, FUN, CST_INT, CST_STR} kind;
+    union 
+    {
+        char* id;           //identifiant (variable, tableau, ou fonction)
+        char* str;          //for string literrak
+        int val;
+    } u;
     union {
         struct fundesc desc;
         enum type type;
@@ -46,7 +51,9 @@ void depilerST(void);
 
 //ajout une entrée dans la table des symbole
 struct symbole* addST_id(char *id, enum type type);
-struct symbole* addST_fun(char *id, enum type type);
+struct symbole* addST_constInt(int val, enum type type);
+struct symbole* addST_constStr(char* val);
+//struct symbole* addST_fun(char *id, enum type type);
 struct symbole* addST_temp();
 
 //cherche dans les tables
@@ -58,16 +65,19 @@ void afficherST(void);
 
 
 static char * const kind_names[] = {
-    [TEMPO] = "temp",
-	[IDENT] = "variable",
-	[TAB] = "tableau",
-	[FUN] = "fonction"
+    [TEMPO] =   "temp",
+	[IDENT] =   "variable",
+	[TAB] =     "tableau",
+	[FUN] =     "fonction",
+    [CST_INT] = "const string",
+    [CST_STR] = "const string"  
 };
 
 static char * const type_names[] = {
-	[INT_T] = "int",
-	[BOOL_T] = "boolean",
-	[VOID] = "void",
-    [TEMP] = "temp"
+	[INT_T] =       "int",
+	[BOOL_T] =      "boolean",
+    [STRING_T] =    "string",
+	[VOID] =        "void",
+    [TEMP] =        "temp"
 };
 #endif

@@ -11,45 +11,54 @@ void genLabel(int line, FILE* out)
 
 void genLoad(struct code3add instr, FILE* out)
 {
-    fprintf(out, "la %s %s\n", instr.dst, instr.arg1);
+    fprintf(out, "la %s, %s\n", instr.dst->u.id, instr.arg1->u.id);
 }
 
 void genLoadimm(struct code3add instr, FILE* out)   // TODO gerer si > 16 bits
 {
-    fprintf(out, "li %s %s\n", instr.dst, instr.arg1);
+    fprintf(out, "li %s, %d\n", instr.dst->u.id, instr.arg1->u.val);
 }
 
 void genStore(struct code3add instr, FILE* out)
 {
-    fprintf(out, "sw %s %s\n", instr.dst, instr.arg1);
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "\tli $t7, %d\n", instr.arg1->u.val);
+        fprintf(out, "\tsw $t7, %s \n", instr.dst->u.id);
+        break;
+    default:
+        fprintf(out, "sw %s, %s\n", instr.dst->u.id, instr.arg1->u.id);
+        break;
+    }
 }
 
 void genAdd(struct code3add instr, FILE* out)
 {
-    fprintf(out, "add %s %s %s\n", instr.dst, instr.arg1, instr.arg2);
+    fprintf(out, "add %s %s %s\n", instr.dst->u.id, instr.arg1->u.id, instr.arg2->u.id);
 }
 
 void genSub(struct code3add instr, FILE* out)
 {
-    fprintf(out, "sub %s %s %s\n", instr.dst, instr.arg1, instr.arg2);
+    fprintf(out, "sub %s %s %s\n", instr.dst->u.id, instr.arg1->u.id, instr.arg2->u.id);
 }
 
 void genMul(struct code3add instr, FILE* out)
 {
-    fprintf(out, "mult %s %s\n", instr.arg1, instr.arg2);
-    fprintf(out, "mflo %s\n", instr.dst);
+    fprintf(out, "mult %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "mflo %s\n", instr.dst->u.id);
 }
 
 void genDivi(struct code3add instr, FILE* out)
 {
-    fprintf(out, "div %s %s\n", instr.arg1, instr.arg2);
-    fprintf(out, "mflo %s\n", instr.dst);
+    fprintf(out, "div %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "mflo %s\n", instr.dst->u.id);
 }
 
 void genMod(struct code3add instr, FILE* out)
 {
-    fprintf(out, "div %s %s\n", instr.arg1, instr.arg2);
-    fprintf(out, "mfhi %s\n", instr.dst);
+    fprintf(out, "div %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "mfhi %s\n", instr.dst->u.id);
 }
 
 void genEq(struct code3add instr, FILE* out)
@@ -87,10 +96,13 @@ void genMips(FILE* out)
 {
     int i = 0;
     struct code3add instr;
+    struct symbole s;
+
+    fprintf(out, "\t.globl main\n\n\t.text\nmain:\n");
     while(i < genCode.size)
     {
         instr = genCode.tab[i++];
-        genLabel(i, out);
+        //genLabel(i, out);
         switch (instr.op) {
             case load: 
                 genLoad(instr, out);
@@ -138,7 +150,12 @@ void genMips(FILE* out)
                 fprintf(stderr, "operation non reconnue\n");
             break;
         }
-        
+    }
+    fprintf(out, "\n\n\t.data\n");
+    for (size_t i=0;i<symTab->size;i++){
+        s=symTab->symb[i];
+        if (s.kind==IDENT)
+            fprintf(out, "%s:\t.word 0\n",s.u.id);
     }
 }
 

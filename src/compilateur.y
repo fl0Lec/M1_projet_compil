@@ -77,6 +77,7 @@ void yyerror(const char *msg);
 %type <val> int_literal
 %type <val> char_literal
 %type <val> bool_literal
+%type <mot> string_literal
 %type <type> type
 
 %type <tabID> liste_id
@@ -132,7 +133,8 @@ statement :
         //reste a faire different assign_op
 
         //store resultat expr dans location
-        gencode(store, $3->id, NULL, $1->id);
+        printf("genCode\n");
+        gencode(store, $3, NULL, $1);
     }
 }
 
@@ -165,6 +167,7 @@ assign_op
 location
 : ID {
     $$=lookupST($1);
+    printf("location found for %s\n", $$->u.id);
     //verification si est dans la table des symboles
     if (!$$){
         fprintf(stderr, "no entry in table for %s\n", $1);
@@ -181,26 +184,27 @@ expr
 | expr bin_op expr {//shif reduce ici
     struct symbole* t=newtemp();
     //switch sur les differentes operations binaires
+    printf("expr\n");
     switch($2){
         case add:
             t->type.type=INT_T;
-            gencode($2, $1->id, $3->id, t->id);
+            gencode($2, $1, $3, t);
             break;
         case sub:
             t->type.type=INT_T;
-            gencode($2, $1->id, $3->id, t->id);
+            gencode($2, $1, $3, t);
             break;
         case mul:
             t->type.type=INT_T;
-            gencode($2, $1->id, $3->id, t->id);
+            gencode($2, $1, $3, t);
             break;
         case divi:
             t->type.type=INT_T;
-            gencode($2, $1->id, $3->id, t->id);
+            gencode($2, $1, $3, t);
             break;
         case mod:
             t->type.type=INT_T;
-            gencode($2, $1->id, $3->id, t->id);
+            gencode($2, $1, $3, t);
             break;
         default :
             break;
@@ -247,23 +251,9 @@ cond_op // TODO courts-cicuits
 */
 
 literal
-: int_literal {
-    struct symbole* temp=newtemp();
-    temp->type.type=INT_T;
-    char buf[10];
-    sprintf(buf, "%d", $1);
-    gencode(loadimm, buf, NULL, temp->id);
-    $$ = temp;
-    }
-| char_literal {
-    struct symbole* temp=newtemp();
-    temp->type.type=INT_T;
-    char buf[10];
-    sprintf(buf, "%d", $1);
-    gencode(loadimm, buf, NULL, temp->id);
-    $$ = temp;
-    }
-| string_literal {$$=NULL;}
+: int_literal {$$ = addST_constInt($1, INT_T);}
+| char_literal { $$ = addST_constInt($1, INT_T);}
+| string_literal {$$=addST_constStr($1);}
 | bool_literal {
     $$=NULL;
     }
@@ -284,7 +274,7 @@ char_literal
 ;
 
 string_literal
-: STRING
+: STRING {$$=$1;}
 ;
 
 
