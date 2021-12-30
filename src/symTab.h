@@ -12,6 +12,7 @@ enum type {BOOL_T, INT_T, STRING_T, VOID, TEMP};
 //descripteur de fonction
 struct fundesc {
     int nbArg;          //nombre d'argument
+    int capacity;       //capcity = allocated
     enum type* args;    //tableau des argument
     enum type ret;      //valeur de retour
 };
@@ -26,10 +27,10 @@ struct symbole {
         int val;
     } u;
     union {
-        struct fundesc desc;
+        struct fundesc* desc;
         enum type type;
     } type;
-    //int location;           //emplacement memoire (comment faire pour fonction ? -1 ?)
+    int location;           //emplacement memoire (comment faire pour fonction ? -1 ?)
 };
 
 struct symTab {
@@ -37,6 +38,7 @@ struct symTab {
     size_t size;            //taille actuelle de la symtab
     size_t capacity;        //taille en mémoire
     size_t nbTemp;          //nombre de temporaire deja present dans symTab
+    int lastloc;            //last location in memorie
     struct symbole* symb;   //tableau des symboles
 };
 
@@ -53,7 +55,7 @@ void depilerST(void);
 struct symbole* addST_id(char *id, enum type type);
 struct symbole* addST_constInt(int val, enum type type);
 struct symbole* addST_constStr(char* val);
-//struct symbole* addST_fun(char *id, enum type type);
+struct symbole* addST_fun(char *id, enum type type, struct fundesc*);
 struct symbole* addST_temp();
 
 //cherche dans les tables
@@ -63,6 +65,8 @@ struct symbole* lookupST(char *id);
 void afficheSymb(struct symbole*);
 void afficherST(void);
 
+struct fundesc* initfun();
+void addtypefd(struct fundesc*, enum type);
 
 static char * const kind_names[] = {
     [TEMPO] =   "temp",

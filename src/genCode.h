@@ -4,7 +4,7 @@
 #include "symTab.h"
 
 
-enum Operation {load, loadimm, store, add, sub, mul, divi, mod,
+enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
                 eq, inf, infeq, sup, supeq, goto_op};
 
 static char * const op_names[] = {
@@ -15,6 +15,7 @@ static char * const op_names[] = {
     [mul] =     "mult",
     [divi] =     "divi",
     [mod] =     "mod",
+    [subun] =   "moins un",
     [eq] =      "eq",
     [inf] =     "inf",
     [infeq] =   "infeq",

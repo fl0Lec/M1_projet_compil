@@ -95,7 +95,7 @@ void yyerror(const char *msg);
 
 program : CLASS ID check_program ACO_O list_decl list_statement ACO_C
 
-check_program : {
+check_program : %empty {
     WRITE("#start program\n");
     //verifie que l'on a bien class Program avant de l'effacer de la pile
     if (strcmp(yylval.mot, "Program")){
@@ -105,7 +105,7 @@ check_program : {
 }
 ;
 
-list_decl :
+list_decl : %empty
 | field_decl list_decl
 ;
 
@@ -118,12 +118,12 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-list_statement : statement
+list_statement : %empty
 | statement list_statement
 ;
 
 statement : 
-|location assign_op expr SEMICOLON {
+location assign_op expr SEMICOLON {
     //verifie que l'on a bien location et expr
     if (!$1)
         printf("location wrong\n");
@@ -211,9 +211,9 @@ expr
     }
     $$=t;
 }
-| USUB expr {$$=NULL;}
+| SUB expr {$$=newtemp(); gencode(subun, $2, 0, $$);}
 | NOT expr  {$$=NULL;}
-| PAR_O expr PAR_C  {$$=NULL;}
+| PAR_O expr PAR_C  {$$=$2;}
 ;
 
 bin_op

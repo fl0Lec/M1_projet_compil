@@ -8,7 +8,7 @@ size_t allignement(enum type t){
         return 4;
         break;
     case BOOL_T:
-        return 1;
+        return 4;
         break;
     case TEMP :
         return 4;
@@ -28,7 +28,7 @@ size_t taille(struct symbole* id)
         return 4;
         break;
     case BOOL_T:
-        return 1;
+        return 4;
         break;
     case TEMP :
         return 4;
@@ -55,6 +55,7 @@ void empilerST(void)
     s->capacity=TAILLE_INIT;
     s->symb=malloc(sizeof(struct symbole)*TAILLE_INIT);
     s->nbTemp=0;
+    s->lastloc=0;
     symTab=s;
 }
 
@@ -67,7 +68,8 @@ void depilerST(void){
     free(s);
 }
 
-//il reste a verifier si déjà present dans la table
+////////////////////////////////////////////////////////////////////
+//TODO il faudrait a verifier si déjà present dans la table
 struct symbole* addST_id(char *id, enum type type)
 {
     checksize(symTab);
@@ -76,6 +78,8 @@ struct symbole* addST_id(char *id, enum type type)
     s->u.id=malloc(sizeof(char)*strlen(id));
     strcpy(s->u.id, id);
     s->type.type=type;
+    s->location=symTab->lastloc;
+    symTab->lastloc+=allignement(TEMP);
     return s; 
 }
 
@@ -87,6 +91,8 @@ struct symbole* addST_temp()
     s->u.id=malloc(sizeof(char)*(1+sizeof(size_t)));
     s->u.id[0]='t';
     sprintf(s->u.id+1, "%ld", symTab->nbTemp++);
+    s->location=symTab->lastloc;
+    symTab->lastloc+=allignement(TEMP);
     return s; 
 }
 
@@ -105,12 +111,43 @@ struct symbole* addST_constStr(char* val)
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=CST_STR;
-    s->u.str=malloc(sizeof(char)*strlen(val)+1);
+    s->u.str=malloc(sizeof(char)*(strlen(val)));
     strcpy(s->u.str, val);
     s->type.type=STRING_T;
     return s;
 }
 
+struct symbole* addST_fun(char *id, enum type ret, struct fundesc* fundesc)
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=FUN;
+    s->u.id=malloc(sizeof(char)*strlen(id));
+    strcpy(s->u.id, id);
+    s->type.desc=fundesc;
+    s->type.desc->ret=ret;
+    return s;
+}
+
+
+struct fundesc* initfun()
+{
+    struct fundesc *fd=malloc(sizeof(struct fundesc));
+    fd->nbArg=0;
+    fd->capacity=4;
+    fd->args = malloc(sizeof(enum type)*fd->capacity);
+    return fd;
+}
+
+void addtypefd(struct fundesc* fd, enum type t)
+{
+    if (fd->nbArg==fd->capacity){
+        fd->capacity*=2;
+        fd->args=realloc(fd->args, sizeof(enum type)*fd->capacity);
+    }
+    fd->args[fd->nbArg++]=t;
+}
+/////////////////////////////////////////////////////
 struct symbole* lookupST(char *id)
 {
     struct symTab *s=symTab;
@@ -135,7 +172,7 @@ void afficheSymb(struct symbole* s)
     case TEMPO:
     case IDENT:
     case TAB:
-        printf("%s", type_names[s->type.type]);
+        printf("%s | location : %d", type_names[s->type.type], s->location);
         break;
     case CST_INT:
         printf("const int | val : %d", s->u.val);
@@ -144,8 +181,10 @@ void afficheSymb(struct symbole* s)
         printf("const str | mot :%s", s->u.str);
         break;
     case FUN:
-        //TODO
-        printf("TODO");
+        printf("retour : %s | args :[", type_names[s->type.desc->ret]);
+        for (int i=0;i<s->type.desc->nbArg;i++)
+            printf("%s, ", type_names[s->type.desc->args[i]]);
+        printf("]");
         break;
     }
     printf("\n");
