@@ -4,11 +4,6 @@
 // generation de codde mips par instruction
 // --------------------------------------
 
-void genLabel(int line, FILE* out)
-{
-    fprintf(out, "line.%d: ", line);
-}
-
 void genLoad(struct code3add instr, FILE* out)
 {
     fprintf(out, "la %s, %s\n", instr.dst->u.id, instr.arg1->u.id);
@@ -91,6 +86,25 @@ void genGoto(struct code3add instr, FILE* out)
     
 }
 
+// un label par ligne de code à trois adresse
+void genLabel(int line, FILE* out)
+{
+    fprintf(out, "line.%d: ", line);
+}
+
+// génère les fonctions d'entrées et sorties
+void genIOFunctions(FILE* out)
+{
+    // print_string : print string en $a0
+    fprintf("\nprint_string:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    // print_bool : print bool en $a0
+    fprintf("\nprint_bool:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    // print_int : print int en $a0
+    fprintf("\nprint_int:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    //read_int : read int vers $v0
+    fprintf("\nread_int:\n  li $v0 5\n  syscall\n  jr $ra\n");
+}
+
 // --------------------------------------
 void genMips(FILE* out)
 {
@@ -98,7 +112,17 @@ void genMips(FILE* out)
     struct code3add instr;
     struct symbole s;
 
-    fprintf(out, "\t.globl main\n\n\t.text\nmain:\n");
+    fprintf(out, "\n.data\n");
+    for (size_t i=0;i<symTab->size;i++){
+        s=symTab->symb[i];
+        if (s.kind==IDENT)
+            fprintf(out, "%s:\t.word 0\n",s.u.id);
+    }
+    
+    fprintf(out, "\n.text\n.globl main\n\nmain:\n");
+    
+    genIOFunctions(out);
+    
     while(i < genCode.size)
     {
         instr = genCode.tab[i++];
@@ -151,12 +175,7 @@ void genMips(FILE* out)
             break;
         }
     }
-    fprintf(out, "\n\n\t.data\n");
-    for (size_t i=0;i<symTab->size;i++){
-        s=symTab->symb[i];
-        if (s.kind==IDENT)
-            fprintf(out, "%s:\t.word 0\n",s.u.id);
-    }
+    fprintf(out, "\n# Program exit\nli $v0 10\nsyscall\n");
 }
 
 
