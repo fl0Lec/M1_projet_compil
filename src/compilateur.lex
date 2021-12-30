@@ -63,14 +63,13 @@ true {return TRUE;}
 class {return CLASS;}
 
 
-if {printf("if\n");}
-for {printf("for\n");}
-return {printf("return\n");}
-break {printf("break\n");}
-continue {printf("continue\n");}
-else {printf("else\n");} 
-void {printf("void\n");}
-
+if {return IF;}
+for {return FOR;}
+return {return RETURN;}
+break {return BREAK;}
+continue {return CONTINUE;}
+else {return ELSE;} 
+void {return VOID;}
 
 
 

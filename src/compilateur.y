@@ -73,6 +73,13 @@ void yyerror(const char *msg);
 %left OR
 %left AND
 
+%token IF
+%token FOR
+%token RETURN
+%token BREAK
+%token CONTINUE
+%token ELSE
+
 %type <mot> ID
 %type <val> int_literal
 %type <val> char_literal
