@@ -96,13 +96,13 @@ void genLabel(int line, FILE* out)
 void genIOFunctions(FILE* out)
 {
     // print_string : print string en $a0
-    fprintf("\nprint_string:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
-    // print_bool : print bool en $a0
-    fprintf("\nprint_bool:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    fprintf(out, "\nprint_string:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    // print_bool : print bool en $a0 TODO (là c'est write string
+    fprintf(out, "\nprint_bool:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
     // print_int : print int en $a0
-    fprintf("\nprint_int:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    fprintf(out, "\nprint_int:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
     //read_int : read int vers $v0
-    fprintf("\nread_int:\n  li $v0 5\n  syscall\n  jr $ra\n");
+    fprintf(out, "\nread_int:\n  li $v0 5\n  syscall\n  jr $ra\n");
 }
 
 // --------------------------------------
