@@ -119,10 +119,10 @@ void genMips(FILE* out)
             fprintf(out, "%s:\t.word 0\n",s.u.id);
     }
     
-    fprintf(out, "\n.text\n.globl main\n\nmain:\n");
+    fprintf(out, "\n.text\n.globl main\n\n");
     
     genIOFunctions(out);
-    
+    fprintf(out, "\nmain:\n\n");
     while(i < genCode.size)
     {
         instr = genCode.tab[i++];
