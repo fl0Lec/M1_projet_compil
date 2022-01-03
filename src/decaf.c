@@ -60,10 +60,12 @@ int main(int argc, char** argv)
     }
     
     //initialise table des symboles
-    empilerST();
     initGenCode();
 
     int r = yyparse();
+
+    if (r != 0)
+        return 1;
 
     genMips(yyout);
     if (afficher_table)
@@ -74,5 +76,5 @@ int main(int argc, char** argv)
     
     fclose(yyin);
     fclose(yyout);
-    return r;
+    return 0;
 }

@@ -7,7 +7,7 @@
 
 //les diffferents type
 //TODO string 
-enum type {BOOL_T, INT_T, STRING_T, VOID, TEMP};
+enum type {BOOL_T, INT_T, STRING_T, VOID_T, TEMP};
 
 //descripteur de fonction
 struct fundesc {
@@ -17,13 +17,13 @@ struct fundesc {
     enum type ret;      //valeur de retour
 };
 
-//liste chainer d'ID
+//liste chainée d'ID
 struct symbole {
     enum  {TEMPO, IDENT, TAB, FUN, CST_INT, CST_STR} kind;
     union 
     {
         char* id;           //identifiant (variable, tableau, ou fonction)
-        char* str;          //for string literrak
+        char* str;          //for string literal
         int val;
     } u;
     union {
@@ -81,7 +81,7 @@ static char * const type_names[] = {
 	[INT_T] =       "int",
 	[BOOL_T] =      "boolean",
     [STRING_T] =    "string",
-	[VOID] =        "void",
+	[VOID_T] =      "void",
     [TEMP] =        "temp"
 };
 #endif

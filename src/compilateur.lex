@@ -41,7 +41,7 @@ true {return TRUE;}
 \+\= {return ASSIGN_PLUS;}
 \-= {return ASSIGN_SUB;}
 
-[-] {return SUB;} //TODO : a en parler de la distinction du moins et unaire + on peut le faire sur en une instruction si on modifie les tokens
+[-] {return SUB;}
 [+] {return PLUS;}
 [*] {return MULT;}
 [/] {return DIV;}
@@ -69,7 +69,7 @@ return {return RETURN;}
 break {return BREAK;}
 continue {return CONTINUE;}
 else {return ELSE;} 
-void {return VOID;}
+void {return VOID_TYPE;}
 
 
 

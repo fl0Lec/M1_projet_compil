@@ -109,7 +109,7 @@ void genMips(FILE* out)
     int i = 0;
     struct code3add instr;
     struct symbole s;
-
+    fprintf(out, "#start program\n");
     fprintf(out, "\n.data\n");
     for (size_t i=0;i<symTab->size;i++){
         s=symTab->symb[i];

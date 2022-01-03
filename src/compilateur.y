@@ -36,6 +36,8 @@ void yyerror(const char *msg);
 %token CLASS
 %token INT_TYPE
 %token BOOL_TYPE
+%token VOID_TYPE
+
 %token <val> INT
 %token <val> HEXA // ? si on traduit en base 10 en C ou pas
 %token <val> CHAR
@@ -93,30 +95,36 @@ void yyerror(const char *msg);
 %type <id> expr
 %type <id> literal
 
+%type <op> rel_op
+%type <op> cond_op
+%type <op> eq_op
 %type <op> arith_op
 %type <op> bin_op
+
+%type <id> method_call
 
 %start program
 
 %%
 
-program : CLASS ID check_program ACO_O list_decl list_statement ACO_C
+program : CLASS ID check_program ACO_O list_field_decl list_method_decl ACO_C
 
 check_program : %empty {
-    WRITE("#start program\n");
-    //verifie que l'on a bien class Program avant de l'effacer de la pile
-    if (strcmp(yylval.mot, "Program")){
-        fprintf(stderr, "erreur attend class Program recoit %s\n", yylval.mot);
-        exit(-1);
-    }
+    // si il y a quelque chose à faire du nom du programme (même nom que le fichier ...)
 }
 ;
 
-list_decl : %empty
-| field_decl list_decl
+list_field_decl : %empty { empilerST(); }
+| list_field_decl field_decl
+;
+
+list_method_decl : %empty
+| list_method_decl method_decl
 ;
 
 field_decl : type liste_id SEMICOLON {
+    if ($1 == VOID_T)
+        yyerror("id de type VOID illégal");
     //ajout dans table des symboles la liste des identifiants dans liste_id
     for (int i=0; i<$2->current;i++){
         addST_id($2->s[i], $1);
@@ -124,6 +132,16 @@ field_decl : type liste_id SEMICOLON {
     freeTD($2);
 }
 ; 
+
+method_decl : type ID ACO_O ACO_C block // procédure
+| type ID ACO_O method_decl_param ACO_C block   // fonction
+
+method_decl_param : method_decl_param COMA method_decl_param
+| type ID
+;
+
+block : ACO_O list_field_decl list_statement ACO_C
+
 
 list_statement : %empty
 | statement list_statement
@@ -144,16 +162,25 @@ location assign_op expr SEMICOLON {
         gencode(store, $3, NULL, $1);
     }
 }
-
+| method_call SEMICOLON
+| IF ACO_O expr ACO_C block ELSE block
+| IF ACO_O expr ACO_C block
+| FOR ID ASSIGN expr COMA expr block
+| RETURN SEMICOLON
+| RETURN expr SEMICOLON
+| BREAK SEMICOLON
+| CONTINUE SEMICOLON
+| block
 ;
 
 type 
 : INT_TYPE {$$ = INT_T;}
 | BOOL_TYPE {$$ = BOOL_T;}
+| VOID_TYPE {$$ = VOID_T;}
 ;
 
-liste_id
-: ID {
+liste_id: %empty {}
+| ID {
     //initialise tableaux dynamique contenue dans liste_id 
     //ajoute l'identifiant dans le tableaux
     $$=initTD(); 
@@ -181,12 +208,29 @@ location
         exit(-1);
     }
 }
-// | ID '[' expr ']' TODO tableaux
+;
+
+method_call
+: ID PAR_O PAR_C {
+    struct symbole* t=newtemp();
+    t->type.desc=initfun();
+    $$=t;
+}   // procédure
+| ID PAR_O method_call_args PAR_C {
+    struct symbole* t=newtemp();
+    t->type.desc=initfun();
+    $$=t;
+} // fonction
+;
+
+method_call_args
+: method_call_args COMA
+| expr
 ;
 
 expr
 : location  {$$=$1;}
-// | method_call TODO
+| method_call {$$=$1;}
 | literal   {$$=$1;}
 | expr bin_op expr {//shif reduce ici
     struct symbole* t=newtemp();
@@ -225,9 +269,9 @@ expr
 
 bin_op
 : arith_op {$$=$1;}
-//| rel_op
-//| eq_op
-//| cond_op
+| rel_op {$$=$1;}
+| eq_op {$$=$1;}
+| cond_op { {$$=$1;}}
 ;
 
 arith_op
@@ -238,24 +282,22 @@ arith_op
 | MOD {$$=mod;}
 ;
 
-/*
 rel_op
-: INF
-| INF_EQ
-| SUP
-| SUP_EQ
+: INF {$$=inf;}
+| INF_EQ {$$=infeq;}
+| SUP {$$=sup;}
+| SUP_EQ {$$=supeq;}
 ;
 
 eq_op
-: EQ
-| NOT_EQ
+: EQ {$$=eq;}
+| NOT_EQ {$$=noteq;}
 ;
 
-cond_op // TODO courts-cicuits
-: OR
-| AND
+cond_op
+: OR {}
+| AND {}
 ;
-*/
 
 literal
 : int_literal {$$ = addST_constInt($1, INT_T);}
@@ -290,4 +332,5 @@ string_literal
 void yyerror(const char *msg)
 {
     fprintf(stderr, "%s\n", msg);
+    exit(1);
 }
