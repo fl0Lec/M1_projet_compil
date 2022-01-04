@@ -58,32 +58,37 @@ void genMod(struct code3add instr, FILE* out)
 
 void genEq(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "beq %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+}
+
+void genNoteq(struct code3add instr, FILE* out)
+{
+    fprintf(out, "bne %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
 }
 
 void genInf(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "blt %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
 }
 
 void genInfeq(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "ble %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
 }
 
 void genSup(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "bgt %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
 }
 
 void genSupeq(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "bge %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
 }
 
 void genGoto(struct code3add instr, FILE* out)
 {
-    
+    fprintf(out, "goto %s %s\n", instr.dst->u.id);
 }
 
 // un label par ligne de code à trois adresse
@@ -153,6 +158,9 @@ void genMips(FILE* out)
             break;
             case eq: 
                 genEq(instr, out);
+            break;
+            case noteq: 
+                genNoteq(instr, out);
             break;
             case inf: 
                 genInf(instr, out);
