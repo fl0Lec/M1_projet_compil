@@ -189,10 +189,12 @@ void afficheSymb(struct symbole* s)
         printf("const str | mot :%s", s->u.str);
         break;
     case FUN:
-        /*printf("retour : %s | args :[", type_names[s->type.desc->ret]);
+        if (!s->type.desc)
+            break;
+        printf("retour : %s | args :[", type_names[s->type.desc->ret]);
         for (int i=0;i<s->type.desc->nbArg;i++)
             printf("%s, ", type_names[s->type.desc->args[i]]);
-        printf("]");*/
+        printf("]");
         break;
     }
     printf("\n");

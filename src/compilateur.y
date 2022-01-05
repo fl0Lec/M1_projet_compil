@@ -27,7 +27,7 @@ void yyerror(const char *msg);
 }
 
 %union {int val; char* mot; enum type type; struct tab* tabID; struct symbole* id; 
-        enum Operation op;}
+        enum Operation op; struct fundesc* fundesc;}
 
 %token SEMICOLON
 
@@ -103,6 +103,8 @@ void yyerror(const char *msg);
 
 %type <id> method_call
 
+%type<fundesc> method_decl_param
+
 %start program
 
 %%
@@ -122,8 +124,8 @@ type ID SEMICOLON declaration {addST_id($2, $1);}
         addST_id($4->s[i], $1);
     }
     freeTD($4);}
-| VOID_TYPE ID PAR_O empile method_decl_param PAR_C block {depilerST(); addST_fun($2, VOID_T, NULL);}
-| type ID PAR_O empile method_decl_param PAR_C block {depilerST(); addST_fun($2, VOID_T, NULL);}
+| VOID_TYPE ID PAR_O empile method_decl_param PAR_C block {depilerST(); $5->ret=VOID_T; addST_fun($2, VOID_T, $5);}
+| type ID PAR_O empile method_decl_param PAR_C block {depilerST(); $5->ret=$1; addST_fun($2, VOID_T, $5);}
 ;
 
 empile : %empty {empilerST();}
@@ -161,12 +163,27 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : VOID_TYPE empile ID PAR_O PAR_C block {depilerST(); addST_fun($3, VOID_T, NULL);}
-| type empile ID ACO_O method_decl_param ACO_C block  {depilerST(); addST_fun($3, VOID_T, NULL);}
+method_decl : VOID_TYPE empile ID PAR_O method_decl_param PAR_C block {depilerST(); $5->ret=VOID_T; addST_fun($3, VOID_T, $5);}
+| type empile ID ACO_O method_decl_param ACO_C block  {depilerST();$5->ret=$1; addST_fun($3, VOID_T,$5);}
 
-method_decl_param : %empty
-|method_decl_param COMA method_decl_param
-| type ID
+method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->capacity=0;$$->args=0;}
+|method_decl_param COMA type ID {
+    if ($1->nbArg==$1->capacity){
+        $1->capacity*=2;
+        $1->args=realloc($1->args, sizeof(enum type)*$1->capacity);
+    }
+    $1->args[$1->nbArg++]=$3;
+    $$=$1;
+    addST_id($4, $3);
+}
+| type ID {
+    $$=malloc(sizeof(struct fundesc));
+    $$->capacity=10;
+    $$->nbArg=0;
+    $$->args=malloc(sizeof(enum type)*10);
+    $$->args[$$->nbArg++]=$1;
+    addST_id($2, $1);
+}
 ;
 
 block : ACO_O list_field_decl list_statement ACO_C

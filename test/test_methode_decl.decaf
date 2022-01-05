@@ -3,7 +3,7 @@ class Program {
     int lecturevaleurs (int val) {
         int i;
     }
-    void main(){
+    void main(int val, boolean b){
         int j;
     }
 }
