@@ -4,8 +4,9 @@ class Program {
     int cpt, nb;
     // no work beacuse 2 time nb int nb, flo, paul, jack;
     // commentaire
-    //nb = 0;
-    cpt = 8;
+    nb = 2;
+    //cpt = - 8;
+    //nb = (8*5)+nb*cpt;
     //cpt = cpt;
     //nb = 'a';
 }

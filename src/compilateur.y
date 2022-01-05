@@ -88,6 +88,7 @@ void yyerror(const char *msg);
 %type <val> bool_literal
 %type <mot> string_literal
 %type <type> type
+%type <type> funtype
 
 %type <tabID> liste_id
 
@@ -133,7 +134,7 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : type ID ACO_O ACO_C block // procédure
+method_decl : funtype ID PAR_O PAR_C block // procédure
 | type ID ACO_O method_decl_param ACO_C block   // fonction
 
 method_decl_param : method_decl_param COMA method_decl_param
@@ -176,6 +177,11 @@ location assign_op expr SEMICOLON {
 type 
 : INT_TYPE {$$ = INT_T;}
 | BOOL_TYPE {$$ = BOOL_T;}
+;
+
+funtype
+: INT_TYPE {$$ = INT_T;}
+| BOOL_TYPE {$$ = BOOL_T;}
 | VOID_TYPE {$$ = VOID_T;}
 ;
 
@@ -200,10 +206,11 @@ assign_op
 
 location
 : ID {
+    //$1[strlen($1)-2]='\0';
     $$=lookupST($1);
-    printf("location found for %s\n", $$->u.id);
     //verification si est dans la table des symboles
     if (!$$){
+        afficherST();
         fprintf(stderr, "no entry in table for %s\n", $1);
         exit(-1);
     }

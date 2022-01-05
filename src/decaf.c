@@ -16,7 +16,7 @@ void usage()
 int main(int argc, char** argv)
 {
     int afficher_table = 0;
-    yydebug = 1; // 1: activer - 0: désactiver
+    yydebug = 0; // 1: activer - 0: désactiver
     yyout = NULL;
     yyin = NULL;
     if (argc<2)

@@ -73,7 +73,7 @@ void {return VOID_TYPE;}
 
 
 
-[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = yytext; return ID;}
+[[:alpha:]]([[:alpha:]]|[0-9])* {yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1)); strcpy(yylval.mot, yytext);return ID;}
 
 [[:space:]] ;
 

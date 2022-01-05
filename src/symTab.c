@@ -153,9 +153,9 @@ struct symbole* lookupST(char *id)
     struct symTab *s=symTab;
     size_t i=0;
     while (s){
-        for (i=0; i<s->size && strcmp(s->symb[i].u.id, id)!=0; i++) ;
+        for (i=0; i<s->size && (s->symb[i].kind!=IDENT || strcmp(s->symb[i].u.id, id)!=0); i++) ;
         if (i<s->size)
-            return &(symTab->symb[i]);
+            return &(s->symb[i]);
         else 
             s=s->prev;
     }
@@ -192,6 +192,12 @@ void afficheSymb(struct symbole* s)
 
 void afficherST(void)
 {
-    for (size_t i=0; i<symTab->size; i++)
-        afficheSymb(&(symTab->symb[i]));
+    struct symTab *s=symTab;
+    while (s){
+        printf("tab prev\n");
+        for (size_t i=0; i<s->size; i++)
+            afficheSymb(&(s->symb[i]));
+        s=s->prev;
+    }
+
 }

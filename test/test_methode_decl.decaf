@@ -1,0 +1,8 @@
+class Program {
+    int compteur, diviseur;
+    void lecturevaleurs (){
+        int i;
+        compteur = 0;
+    }
+    //void lecturevaleurs (int nombre);
+}
