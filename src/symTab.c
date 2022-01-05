@@ -56,6 +56,17 @@ void empilerST(void)
     s->symb=malloc(sizeof(struct symbole)*TAILLE_INIT);
     s->nbTemp=0;
     s->lastloc=0;
+    s->size_fils = 0;
+    s-> capacity_fils = TAILLE_INIT;
+    s->fils=malloc(sizeof(struct symTab *)*TAILLE_INIT);
+    if (symTab){
+        if (symTab->size_fils==s->capacity_fils){
+            symTab->capacity*=2;
+            symTab->fils=realloc(symTab->fils, sizeof(struct symTab *)*symTab->capacity_fils);
+        }
+        symTab->fils[symTab->size_fils++]=s;
+    }
+
     symTab=s;
 }
 
@@ -200,4 +211,26 @@ void afficherST(void)
         s=s->prev;
     }
 
+}
+
+
+void affichRecST(struct symTab* s, char tab[10]){
+    printf("other symbtab :\n");
+    for (size_t i=0; i<s->size; i++){
+        printf("%s", tab);
+        afficheSymb(&(s->symb[i]));
+    }
+    tab = strcat(tab, "\t");
+    for (size_t i=0; i<s->size_fils;i++){
+        affichRecST((s->fils[i]), tab);
+    }
+}
+
+void afficheAllST(void){
+    struct symTab* s=symTab;
+    while (s->prev)
+        s=s->prev;
+    char tab[10]; tab[0]='\0';
+    affichRecST(s, tab);
+    
 }

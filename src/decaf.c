@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 
     genMips(yyout);
     if (afficher_table)
-        afficherST();
+        afficheAllST();
     printf("\n");
     afficheGenCode();
     depilerST();

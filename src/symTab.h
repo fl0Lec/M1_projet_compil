@@ -35,6 +35,8 @@ struct symbole {
 
 struct symTab {
     struct symTab *prev;    //table des symboles de "niveau superieur"
+    struct symTab **fils;    //table des symboles suivantes
+    size_t size_fils, capacity_fils;
     size_t size;            //taille actuelle de la symtab
     size_t capacity;        //taille en mémoire
     size_t nbTemp;          //nombre de temporaire deja present dans symTab
@@ -64,6 +66,7 @@ struct symbole* lookupST(char *id);
 //afficheST et ID
 void afficheSymb(struct symbole*);
 void afficherST(void);
+void afficheAllST(void);
 
 struct fundesc* initfun();
 void addtypefd(struct fundesc*, enum type);

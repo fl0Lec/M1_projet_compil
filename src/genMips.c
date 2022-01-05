@@ -88,7 +88,7 @@ void genSupeq(struct code3add instr, FILE* out)
 
 void genGoto(struct code3add instr, FILE* out)
 {
-    fprintf(out, "goto %s %s\n", instr.dst->u.id);
+    fprintf(out, "goto %s %s\n", instr.dst->u.id, "");
 }
 
 // un label par ligne de code à trois adresse
