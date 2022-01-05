@@ -37,6 +37,9 @@ dst := arg1 / arg2
 ## mod
 dst := arg1 % arg2
 
+## subun
+dst := - arg1
+
 # opérations de controle
 
 les opérateurs de controle sont :
