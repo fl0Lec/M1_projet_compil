@@ -1,8 +1,9 @@
 class Program {
-    int compteur, diviseur;
-    void lecturevaleurs (){
+    int compteur, diviseur, cpt, n;
+    int lecturevaleurs (int val) {
         int i;
-        compteur = 0;
     }
-    //void lecturevaleurs (int nombre);
+    void main(){
+        int j;
+    }
 }

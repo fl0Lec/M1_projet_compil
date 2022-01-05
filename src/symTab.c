@@ -71,12 +71,9 @@ void empilerST(void)
 }
 
 //TODO peut être ne pas liberer la memoire mais garder la table plus tard pour la generation de code ?
-void depilerST(void){
-    struct symTab *s=symTab;
-    //TODO liberer memoire quand fonction
+void depilerST(void)
+{
     symTab=symTab->prev;
-    free(s->symb);
-    free(s);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -136,7 +133,7 @@ struct symbole* addST_fun(char *id, enum type ret, struct fundesc* fundesc)
     s->u.id=malloc(sizeof(char)*strlen(id));
     strcpy(s->u.id, id);
     s->type.desc=fundesc;
-    s->type.desc->ret=ret;
+    //s->type.desc->ret=ret;
     return s;
 }
 
@@ -192,10 +189,10 @@ void afficheSymb(struct symbole* s)
         printf("const str | mot :%s", s->u.str);
         break;
     case FUN:
-        printf("retour : %s | args :[", type_names[s->type.desc->ret]);
+        /*printf("retour : %s | args :[", type_names[s->type.desc->ret]);
         for (int i=0;i<s->type.desc->nbArg;i++)
             printf("%s, ", type_names[s->type.desc->args[i]]);
-        printf("]");
+        printf("]");*/
         break;
     }
     printf("\n");
@@ -214,15 +211,14 @@ void afficherST(void)
 }
 
 
-void affichRecST(struct symTab* s, char tab[10]){
+void affichRecST(struct symTab* s, int lvl){
     printf("other symbtab :\n");
     for (size_t i=0; i<s->size; i++){
-        printf("%s", tab);
+        for (int j=0; j<lvl; j++) printf("\t");
         afficheSymb(&(s->symb[i]));
     }
-    tab = strcat(tab, "\t");
     for (size_t i=0; i<s->size_fils;i++){
-        affichRecST((s->fils[i]), tab);
+        affichRecST((s->fils[i]), lvl+1);
     }
 }
 
@@ -230,7 +226,6 @@ void afficheAllST(void){
     struct symTab* s=symTab;
     while (s->prev)
         s=s->prev;
-    char tab[10]; tab[0]='\0';
-    affichRecST(s, tab);
+    affichRecST(s, 0);
     
 }

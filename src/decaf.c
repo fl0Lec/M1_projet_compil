@@ -15,7 +15,7 @@ void usage()
 
 int main(int argc, char** argv)
 {
-    int afficher_table = 0;
+    int afficher_table = 1;
     yydebug = 0; // 1: activer - 0: désactiver
     yyout = NULL;
     yyin = NULL;
@@ -61,6 +61,7 @@ int main(int argc, char** argv)
     
     //initialise table des symboles
     initGenCode();
+    empilerST();
 
     int r = yyparse();
 

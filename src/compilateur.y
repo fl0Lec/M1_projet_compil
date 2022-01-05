@@ -88,7 +88,6 @@ void yyerror(const char *msg);
 %type <val> bool_literal
 %type <mot> string_literal
 %type <type> type
-%type <type> funtype
 
 %type <tabID> liste_id
 
@@ -108,15 +107,43 @@ void yyerror(const char *msg);
 
 %%
 
-program : CLASS ID check_program ACO_O list_field_decl list_method_decl ACO_C
+program : CLASS ID check_program ACO_O declaration list_method_decl ACO_C
 
 check_program : %empty {
     // si il y a quelque chose à faire du nom du programme (même nom que le fichier ...)
 }
 ;
 
-list_field_decl : %empty { empilerST(); }
+declaration : 
+type ID SEMICOLON declaration {addST_id($2, $1);}
+| type ID COMA liste_id SEMICOLON declaration {
+    addST_id($2, $1);
+    for (int i=0; i<$4->current;i++){
+        addST_id($4->s[i], $1);
+    }
+    freeTD($4);}
+| VOID_TYPE ID PAR_O empile method_decl_param PAR_C block {depilerST(); addST_fun($2, VOID_T, NULL);}
+| type ID PAR_O empile method_decl_param PAR_C block {depilerST(); addST_fun($2, VOID_T, NULL);}
+;
+
+empile : %empty {empilerST();}
+;
+
+list_field_decl : %empty {}
 | list_field_decl field_decl
+;
+
+liste_id: %empty {}
+| ID {
+    //initialise tableaux dynamique contenue dans liste_id 
+    //ajoute l'identifiant dans le tableaux
+    $$=initTD(); 
+    addTD($$, $1, strlen($1));
+    }
+| liste_id COMA ID {
+    //ajoute l'identifiant dans le tableaux
+    addTD($$, $3, strlen($3));
+    }
 ;
 
 list_method_decl : %empty
@@ -134,10 +161,11 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : funtype ID PAR_O PAR_C block // procédure
-| type ID ACO_O method_decl_param ACO_C block   // fonction
+method_decl : VOID_TYPE empile ID PAR_O PAR_C block {depilerST(); addST_fun($3, VOID_T, NULL);}
+| type empile ID ACO_O method_decl_param ACO_C block  {depilerST(); addST_fun($3, VOID_T, NULL);}
 
-method_decl_param : method_decl_param COMA method_decl_param
+method_decl_param : %empty
+|method_decl_param COMA method_decl_param
 | type ID
 ;
 
@@ -177,25 +205,6 @@ location assign_op expr SEMICOLON {
 type 
 : INT_TYPE {$$ = INT_T;}
 | BOOL_TYPE {$$ = BOOL_T;}
-;
-
-funtype
-: INT_TYPE {$$ = INT_T;}
-| BOOL_TYPE {$$ = BOOL_T;}
-| VOID_TYPE {$$ = VOID_T;}
-;
-
-liste_id: %empty {}
-| ID {
-    //initialise tableaux dynamique contenue dans liste_id 
-    //ajoute l'identifiant dans le tableaux
-    $$=initTD(); 
-    addTD($$, $1, strlen($1));
-    }
-| liste_id COMA ID {
-    //ajoute l'identifiant dans le tableaux
-    addTD($$, $3, strlen($3));
-    }
 ;
 
 assign_op
