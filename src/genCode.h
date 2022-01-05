@@ -5,7 +5,7 @@
 
 
 enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
-                eq, inf, infeq, sup, supeq, goto_op};
+                eq, noteq, inf, infeq, sup, supeq, goto_op};
 
 static char * const op_names[] = {
 	[load] =    "load",
@@ -13,10 +13,11 @@ static char * const op_names[] = {
 	[store] =   "store",
     [add] =     "add",
     [mul] =     "mult",
-    [divi] =     "divi",
+    [divi] =    "divi",
     [mod] =     "mod",
     [subun] =   "moins un",
     [eq] =      "eq",
+    [noteq] =   "noteq",
     [inf] =     "inf",
     [infeq] =   "infeq",
     [sup] =     "sup", 

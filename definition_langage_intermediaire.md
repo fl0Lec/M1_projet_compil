@@ -37,8 +37,11 @@ dst := arg1 / arg2
 ## mod
 dst := arg1 % arg2
 
+<<<<<<< HEAD
 ## subun
 dst := - arg1
+=======
+>>>>>>> 848e475d4f149dbe5f223c955095e45b5c5d71c7
 
 # opérations de controle
 
@@ -48,6 +51,10 @@ les opérateurs de controle sont :
 ## eq
 
 goto dst if arg1 == arg2
+
+## noteq
+
+goto dst if arg1 != arg2
 
 ## inf
 
@@ -64,7 +71,6 @@ goto dst if arg1 > arg2
 ## supeq
 
 goto dst if arg1 >= arg2
-
 
 ## goto_op
 goto dst
