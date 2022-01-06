@@ -14,8 +14,28 @@ CHAR [[:alpha:][:digit:]]
 %%
 
 \/\/[^\n]*[\n] ;
-[0-9]* {yylval.val = atoi(yytext); return INT;} //TODO : limiter les valeurs entre -2147483648 et 2147483648
-[0][x][0-9a-fA-F]+ {yylval.val = strtol(yytext, NULL, 0); return HEXA;} //si ca ne marche pas, modifier les argument de strol
+[0-9]* {
+    yylval.val = atoi(yytext);
+    char tmp [20];
+    snprintf(tmp, 20, "%d", yylval.val);
+    if (strcmp(tmp, yytext) != 0) {
+        fprintf(stderr, "DecimalDepassement (%s %s)\n", yytext, tmp);
+        exit(1);
+    }
+    return INT;
+}
+[0][x][0-9a-fA-F]+ {
+    yylval.val = strtol(yytext, NULL, 0);
+    char tmp [20];
+    snprintf(tmp, 20, "0x%x", yylval.val);
+    
+    if (strcmp(tmp, yytext) != 0) {
+        fprintf(stderr, "HexadecimalDepassement (%s, %s)\n", yytext, tmp);
+        exit(1);
+    }
+    return HEXA;
+} //si ca ne marche pas, modifier les argument de strol
+
 \'{CHAR}\' {yylval.val = (int) yytext[1]; return CHAR;}
 \"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {yylval.mot = yytext; return STRING;}
 \'\\\"\' {yylval.val = (int) yytext[1]; return CHAR;}

@@ -39,7 +39,7 @@ void yyerror(const char *msg);
 %token VOID_TYPE
 
 %token <val> INT
-%token <val> HEXA // ? si on traduit en base 10 en C ou pas
+%token <val> HEXA
 %token <val> CHAR
 %token <mot> STRING
 %token BOOL
@@ -65,7 +65,7 @@ void yyerror(const char *msg);
 %token ACO_C
 %token COMA
 
-// TODO pas tout de suite
+/* BOOLEAN OPERATIONS */
 %token INF_EQ
 %token SUP_EQ
 %token INF
@@ -75,6 +75,7 @@ void yyerror(const char *msg);
 %left OR
 %left AND
 
+/* CONTROL STRUCTURES */
 %token IF
 %token FOR
 %token RETURN
@@ -82,6 +83,7 @@ void yyerror(const char *msg);
 %token CONTINUE
 %token ELSE
 
+/* TYPES */
 %type <mot> ID
 %type <val> int_literal
 %type <val> char_literal
