@@ -7,6 +7,8 @@
 enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
                 eq, noteq, inf, infeq, sup, supeq, goto_op};
 
+enum Assign_op_type {NORMAL_ASSIGN, ADD_ASSIGN, SUB_ASSIGN};
+
 static char * const op_names[] = {
 	[load] =    "load",
 	[loadimm] = "loadimm",

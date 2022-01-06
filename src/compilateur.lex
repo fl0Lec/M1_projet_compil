@@ -9,7 +9,7 @@
 %option nounput
 %option noyywrap
 
-CHAR [[:alpha:][:digit:]]
+CHAR [[:alpha:][:digit:]#_]
 
 %%
 
@@ -97,12 +97,17 @@ void {return VOID_TYPE;}
 
 
 
-[[:alpha:]_]([[:alpha:]0-9_])* {yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1)); strcpy(yylval.mot, yytext);return ID;}
+[[:alpha:]_]([[:alpha:]0-9_])* {
+    yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1));
+    strcpy(yylval.mot, yytext);
+    return ID;
+}
 
 [[:space:]] ;
 
 . {
     fprintf(stderr, "Caractere illegal (%d %c)\n", yytext[0], yytext[0]);
+    exit(1);
 }
 
 %%
