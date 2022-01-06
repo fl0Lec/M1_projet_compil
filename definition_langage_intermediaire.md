@@ -73,4 +73,7 @@ goto dst if arg1 >= arg2
 goto dst
 
 ## label
-dst est le nom du label (fonction)
+dst : est le nom du label (fonction)
+
+##ret 
+return dst 

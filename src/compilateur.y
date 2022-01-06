@@ -12,6 +12,13 @@ extern FILE* yyout;
 
 void yyerror(const char *msg);
 
+enum type last_type;
+
+void error(char* msg)
+{
+    fprintf(stderr, "%s\n", msg);
+    exit(-1);
+}
 /**
  *  fonctions à utiliser dans le code des grammaires
  */
@@ -92,7 +99,6 @@ void yyerror(const char *msg);
 %type <mot> string_literal
 %type <type> type
 
-%type <tabID> liste_id
 
 %type <id> location
 %type <id> expr
@@ -123,13 +129,8 @@ check_program : %empty {
 ;
 
 declaration : 
-type ID SEMICOLON declaration {addST_id($2, $1);}
-| type ID COMA liste_id SEMICOLON declaration {
-    addST_id($2, $1);
-    for (int i=0; i<$4->current;i++){
-        addST_id($4->s[i], $1);
-    }
-    freeTD($4);}
+type ID add_id_imm SEMICOLON declaration 
+| type ID add_id_imm COMA liste_id SEMICOLON declaration 
 | VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C block {
     $5->context=symTab;
     depilerST();
@@ -143,6 +144,7 @@ type ID SEMICOLON declaration {addST_id($2, $1);}
     struct symbole *s=addST_fun($2, $5); 
     completeLabel($4, s);}
 ;
+add_id_imm : %empty {addST_id(yylval.mot, last_type);}
 
 empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
@@ -152,16 +154,8 @@ list_field_decl : %empty {}
 ;
 
 liste_id: %empty {}
-| ID {
-    //initialise tableaux dynamique contenue dans liste_id 
-    //ajoute l'identifiant dans le tableaux
-    $$=initTD(); 
-    addTD($$, $1, strlen($1));
-    }
-| liste_id COMA ID {
-    //ajoute l'identifiant dans le tableaux
-    addTD($$, $3, strlen($3));
-    }
+| ID add_id_imm 
+| liste_id COMA ID add_id_imm
 ;
 
 list_method_decl : %empty
@@ -171,11 +165,6 @@ list_method_decl : %empty
 field_decl : type liste_id SEMICOLON {
     if ($1 == VOID_T)
         yyerror("id de type VOID illégal");
-    //ajout dans table des symboles la liste des identifiants dans liste_id
-    for (int i=0; i<$2->current;i++){
-        addST_id($2->s[i], $1);
-    }
-    freeTD($2);
 }
 ; 
 
@@ -243,19 +232,19 @@ location assign_op expr SEMICOLON {
     }
 }
 | method_call SEMICOLON
-| IF ACO_O expr ACO_C block ELSE block
-| IF ACO_O expr ACO_C block
+| IF PAR_O expr PAR_C block ELSE block
+| IF PAR_O expr PAR_C block
 | FOR ID ASSIGN expr COMA expr block
-| RETURN SEMICOLON 
-| RETURN expr SEMICOLON
+| RETURN SEMICOLON {gencode(ret, NULL, NULL, NULL);}
+| RETURN expr SEMICOLON {gencode(ret, NULL, NULL, $2);}
 | BREAK SEMICOLON
 | CONTINUE SEMICOLON
 | block
 ;
 
 type 
-: INT_TYPE {$$ = INT_T;}
-| BOOL_TYPE {$$ = BOOL_T;}
+: INT_TYPE {$$ = INT_T; last_type = $$;}
+| BOOL_TYPE {$$ = BOOL_T; last_type = $$;}
 ;
 
 assign_op
@@ -302,13 +291,14 @@ expr
 | expr bin_op expr {//shif reduce ici
     struct symbole* t=newtemp();
     //switch sur les differentes operations binaires
-    printf("expr\n");
     switch($2){
         case add:
         case sub:
         case mul:
         case divi:
         case mod:
+            if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+                error("erreur de type doit être de type int");
             t->type.type=INT_T;
             gencode($2, $1, $3, t);
             break;
@@ -317,7 +307,12 @@ expr
     }
     $$=t;
 }
-| SUB expr {$$=newtemp(); gencode(subun, $2, 0, $$);}
+| SUB expr {
+    $$=newtemp();
+    $$->type.type=INT_T;
+    if (!$2 || $2->type.type!=INT_T)
+        error("erreur de type doit être int");
+    gencode(subun, $2, 0, $$);}
 | NOT expr  {$$=NULL;}
 | PAR_O expr PAR_C  {$$=$2;}
 ;

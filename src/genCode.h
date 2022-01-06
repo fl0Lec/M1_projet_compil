@@ -5,7 +5,8 @@
 
 
 enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
-                eq, noteq, inf, infeq, sup, supeq, goto_op, label};
+                eq, noteq, inf, infeq, sup, supeq, goto_op, 
+                label, ret};
 
 enum Assign_op_type {NORMAL_ASSIGN, ADD_ASSIGN, SUB_ASSIGN};
 
@@ -25,7 +26,8 @@ static char * const op_names[] = {
     [sup] =     "sup", 
     [supeq] =   "supeq",
     [goto_op] = "goto_op",
-    [label] =   "label"
+    [label] =   "label",
+    [ret] =     "return"
 };
 
 struct code3add{

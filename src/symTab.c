@@ -99,11 +99,24 @@ void initST(void)
     addST_fun("WriteString", desc);
     
 }
+
+void check_idST(char* str){
+    for (size_t i=0; i<symTab->size; i++){
+        struct symbole* s=&symTab->symb[i];
+        if ((s->kind==IDENT || s->kind==TAB || s->kind==FUN) && strcmp(str, s->u.id)==0){
+            fprintf(stderr, "impossible identifiant : %s deja present\n", str);
+            afficherST();
+            exit(-1);
+        }
+
+    }
+}
 ////////////////////////////////////////////////////////////////////
 //TODO il faudrait a verifier si déjà present dans la table
 struct symbole* addST_id(char *id, enum type type)
 {
     checksize(symTab);
+    check_idST(id);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=IDENT;
     s->u.id=malloc(sizeof(char)*strlen(id));
@@ -151,6 +164,7 @@ struct symbole* addST_constStr(char* val)
 struct symbole* addST_fun(char *id, struct fundesc* fundesc)
 {
     checksize(symTab);
+    check_idST(id);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=FUN;
     s->u.id=malloc(sizeof(char)*strlen(id));
