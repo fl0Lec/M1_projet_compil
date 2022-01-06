@@ -27,8 +27,8 @@ void yyerror(const char *msg);
 }
 
 %union {int val; char* mot; enum type type; struct tab* tabID; struct symbole* id; 
-        enum Operation op; struct fundesc* fundesc; struct list_addr* list_addr;}
-
+        enum Operation op; struct fundesc* fundesc; struct list_addr* list_addr; enum Assign_op_type assign_op_type; }
+        
 %token SEMICOLON
 
 /* LITERALS */
@@ -36,6 +36,7 @@ void yyerror(const char *msg);
 %token CLASS
 %token INT_TYPE
 %token BOOL_TYPE
+%token STRING_TYPE
 %token VOID_TYPE
 
 %token <val> INT
@@ -102,6 +103,7 @@ void yyerror(const char *msg);
 %type <op> eq_op
 %type <op> arith_op
 %type <op> bin_op
+%type <assign_op_type> assign_op
 
 %type <id> method_call
 
@@ -227,10 +229,17 @@ location assign_op expr SEMICOLON {
         printf("expr wrong\n");
     else {
         //reste a faire different assign_op
-
-        //store resultat expr dans location
-        printf("genCode\n");
-        gencode(store, $3, NULL, $1);
+        switch ($2) {
+            case ADD_ASSIGN:
+                gencode(add, $1, $3, $1);   // peut être loadtmp puis store
+            break;
+            case SUB_ASSIGN:
+                gencode(sub, $1, $3, $1);
+            break;
+            default:
+                gencode(store, $3, NULL, $1);
+            break;
+        }
     }
 }
 | method_call SEMICOLON
@@ -250,9 +259,9 @@ type
 ;
 
 assign_op
-: ASSIGN
-| ASSIGN_PLUS
-| ASSIGN_SUB
+: ASSIGN {$$=NORMAL_ASSIGN;}
+| ASSIGN_PLUS {$$=ADD_ASSIGN;}
+| ASSIGN_SUB {$$=SUB_ASSIGN;}
 ;
 
 location
@@ -296,21 +305,9 @@ expr
     printf("expr\n");
     switch($2){
         case add:
-            t->type.type=INT_T;
-            gencode($2, $1, $3, t);
-            break;
         case sub:
-            t->type.type=INT_T;
-            gencode($2, $1, $3, t);
-            break;
         case mul:
-            t->type.type=INT_T;
-            gencode($2, $1, $3, t);
-            break;
         case divi:
-            t->type.type=INT_T;
-            gencode($2, $1, $3, t);
-            break;
         case mod:
             t->type.type=INT_T;
             gencode($2, $1, $3, t);

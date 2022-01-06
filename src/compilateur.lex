@@ -9,7 +9,7 @@
 %option nounput
 %option noyywrap
 
-CHAR [[:alpha:][:digit:]]
+CHAR [[:alpha:][:digit:]#_]
 
 %%
 
@@ -37,12 +37,16 @@ CHAR [[:alpha:][:digit:]]
 } //si ca ne marche pas, modifier les argument de strol
 
 \'{CHAR}\' {yylval.val = (int) yytext[1]; return CHAR;}
-\"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {yylval.mot = yytext; return STRING;}
-\'\\\"\' {yylval.val = (int) yytext[1]; return CHAR;}
-\'\\\'\' {yylval.val = (int) yytext[1]; return CHAR;}
-\'\\\\\' {yylval.val = (int) yytext[1]; return CHAR;}
-\'\\[t]\' {yylval.val = (int) yytext[1]; return CHAR;}
-\'\\[n]\' {yylval.val = (int) yytext[1]; return CHAR;}
+\"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {
+    yylval.mot = yytext;
+    return STRING;
+}
+\'\\(\"|[t]|[n]|\\|\')\' {
+    char tmp [5];
+    snprintf(tmp, 5, "%s", yytext);
+    yylval.val = (int) tmp[1];
+    return CHAR;
+}
 
 int {return INT_TYPE;}
 boolean {return BOOL_TYPE;}
@@ -93,12 +97,17 @@ void {return VOID_TYPE;}
 
 
 
-[[:alpha:]_]([[:alpha:]0-9_])* {yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1)); strcpy(yylval.mot, yytext);return ID;}
+[[:alpha:]_]([[:alpha:]0-9_])* {
+    yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1));
+    strcpy(yylval.mot, yytext);
+    return ID;
+}
 
 [[:space:]] ;
 
 . {
-    fprintf(stderr, "Caractère illégal (%d %c)\n", yytext[0], yytext[0]);
+    fprintf(stderr, "Caractere illegal (%d %c)\n", yytext[0], yytext[0]);
+    exit(1);
 }
 
 %%

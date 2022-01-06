@@ -15,7 +15,7 @@ void usage()
 
 int main(int argc, char** argv)
 {
-    int afficher_table = 1;
+    int afficher_table = 0;
     yydebug = 0; // 1: activer - 0: désactiver
     yyout = NULL;
     yyin = NULL;
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     if (r != 0)
         return 1;
 
-    //genMips(yyout);
+    genMips(yyout);
     if (afficher_table)
         afficheAllST();
     printf("\n");
