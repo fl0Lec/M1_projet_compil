@@ -5,7 +5,7 @@
 
 
 enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
-                eq, noteq, inf, infeq, sup, supeq, goto_op};
+                eq, noteq, inf, infeq, sup, supeq, goto_op, label};
 
 static char * const op_names[] = {
 	[load] =    "load",
@@ -22,7 +22,8 @@ static char * const op_names[] = {
     [infeq] =   "infeq",
     [sup] =     "sup", 
     [supeq] =   "supeq",
-    [goto_op] = "goto_op"
+    [goto_op] = "goto_op",
+    [label] =   "label"
 };
 
 struct code3add{
@@ -37,6 +38,15 @@ struct genCode
     int capacity;
 }genCode;
 
+struct addr {
+    size_t val;
+    struct addr* next;
+};
+
+struct list_addr {
+    struct addr* head;
+    struct addr* tail;
+};
 
 //initialise le tableau gencode (dans decaf.c)
 void initGenCode(void);
@@ -49,5 +59,20 @@ void gencode(enum Operation, struct symbole* s1, struct symbole* s2, struct symb
 
 //affiche tous le code generer
 void afficheGenCode();
+
+//renvoye liste avec une addresse 
+struct list_addr* creerlist(size_t val);
+
+//ajout un element a la liste
+void addlist(struct list_addr*, size_t);
+
+//concat deux liste renvoye le pointeur sur la première
+struct list_addr* concat(struct list_addr*, struct list_addr*);
+
+//complete les destination dans liste et libère la mémoire
+void complete(struct list_addr*, int);
+
+//compele la fonction quand label
+void completeLabel(struct list_addr*, struct symbole*);
 #endif
 

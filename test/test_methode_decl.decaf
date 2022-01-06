@@ -1,9 +1,14 @@
 class Program {
-    int compteur, diviseur, cpt, n;
-    int lecturevaleurs (int val) {
+    int compteur, diviseur;
+    void lecturevaleurs (int val) {
         int i;
     }
-    void main(int val, boolean b){
+
+    int main(int i){
         int j;
+        j=0;
+        // TODO genMips pour plus complexe comme :
+        //compteur = (8*j)+10;
+        compteur = j;
     }
 }

@@ -76,6 +76,35 @@ void depilerST(void)
     symTab=symTab->prev;
 }
 
+void initST(void)
+{
+    empilerST();
+    struct fundesc* desc=malloc(sizeof(struct fundesc));
+    desc->nbArg=1;
+    desc->args=malloc(sizeof(enum type)*desc->nbArg);
+    desc->args[0]=INT_T;
+    desc->ret=VOID_T;
+    addST_fun("WriteInt", desc);
+    desc=malloc(sizeof(struct fundesc));
+    desc->nbArg=1;
+    desc->ret=VOID_T;
+    desc->args=malloc(sizeof(enum type)*desc->nbArg);
+    desc->args[0]=INT_T;
+    addST_fun("ReadInt", desc);
+    desc=malloc(sizeof(struct fundesc));
+    desc->nbArg=1;
+    desc->ret=VOID_T;
+    desc->args=malloc(sizeof(enum type)*desc->nbArg);
+    desc->args[0]=BOOL_T;
+    addST_fun("WriteBool", desc);
+    desc=malloc(sizeof(struct fundesc));
+    desc->nbArg=1;
+    desc->ret=VOID_T;
+    desc->args=malloc(sizeof(enum type)*desc->nbArg);
+    desc->args[0]=STRING_T;
+    addST_fun("WriteString", desc);
+    
+}
 ////////////////////////////////////////////////////////////////////
 //TODO il faudrait a verifier si déjà present dans la table
 struct symbole* addST_id(char *id, enum type type)
@@ -125,7 +154,7 @@ struct symbole* addST_constStr(char* val)
     return s;
 }
 
-struct symbole* addST_fun(char *id, enum type ret, struct fundesc* fundesc)
+struct symbole* addST_fun(char *id, struct fundesc* fundesc)
 {
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
@@ -161,7 +190,10 @@ struct symbole* lookupST(char *id)
     struct symTab *s=symTab;
     size_t i=0;
     while (s){
-        for (i=0; i<s->size && (s->symb[i].kind!=IDENT || strcmp(s->symb[i].u.id, id)!=0); i++) ;
+        for (i=0; i<s->size ; i++) {
+            if ((s->symb[i].kind==FUN || s->symb[i].kind==IDENT || s->symb[i].kind==TAB) && strcmp(s->symb[i].u.id, id)==0)
+                break;
+        }
         if (i<s->size)
             return &(s->symb[i]);
         else 
@@ -204,7 +236,7 @@ void afficherST(void)
 {
     struct symTab *s=symTab;
     while (s){
-        printf("tab prev\n");
+        printf("tab \n");
         for (size_t i=0; i<s->size; i++)
             afficheSymb(&(s->symb[i]));
         s=s->prev;

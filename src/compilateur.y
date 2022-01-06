@@ -27,7 +27,7 @@ void yyerror(const char *msg);
 }
 
 %union {int val; char* mot; enum type type; struct tab* tabID; struct symbole* id; 
-        enum Operation op; struct fundesc* fundesc;}
+        enum Operation op; struct fundesc* fundesc; struct list_addr* list_addr;}
 
 %token SEMICOLON
 
@@ -107,6 +107,8 @@ void yyerror(const char *msg);
 
 %type<fundesc> method_decl_param
 
+%type <list_addr> empile_fun
+
 %start program
 
 %%
@@ -126,11 +128,21 @@ type ID SEMICOLON declaration {addST_id($2, $1);}
         addST_id($4->s[i], $1);
     }
     freeTD($4);}
-| VOID_TYPE ID PAR_O empile method_decl_param PAR_C block {depilerST(); $5->ret=VOID_T; addST_fun($2, VOID_T, $5);}
-| type ID PAR_O empile method_decl_param PAR_C block {depilerST(); $5->ret=$1; addST_fun($2, VOID_T, $5);}
+| VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C block {
+    $5->context=symTab;
+    depilerST();
+    $5->ret=VOID_T; 
+    struct symbole*s=addST_fun($2, $5); 
+    completeLabel($4, s);}
+| type ID PAR_O empile_fun method_decl_param PAR_C block {
+    $5->context=symTab;
+    depilerST(); 
+    $5->ret=$1; 
+    struct symbole *s=addST_fun($2, $5); 
+    completeLabel($4, s);}
 ;
 
-empile : %empty {empilerST();}
+empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
 
 list_field_decl : %empty {}
@@ -165,8 +177,19 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : VOID_TYPE empile ID PAR_O method_decl_param PAR_C block {depilerST(); $5->ret=VOID_T; addST_fun($3, VOID_T, $5);}
-| type empile ID ACO_O method_decl_param ACO_C block  {depilerST();$5->ret=$1; addST_fun($3, VOID_T,$5);}
+method_decl : VOID_TYPE ID empile_fun PAR_O method_decl_param PAR_C block {
+    $5->context=symTab;
+    depilerST(); 
+    $5->ret=VOID_T; 
+    struct symbole* s=addST_fun($2, $5); 
+    completeLabel($3, s);
+    }
+| type ID empile_fun PAR_O method_decl_param PAR_C block  {
+    $5->context=symTab;
+    depilerST();
+    $5->ret=$1;
+    struct symbole* s=addST_fun($2, $5); 
+    completeLabel($3, s);}
 
 method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->capacity=0;$$->args=0;}
 |method_decl_param COMA type ID {
@@ -214,7 +237,7 @@ location assign_op expr SEMICOLON {
 | IF ACO_O expr ACO_C block ELSE block
 | IF ACO_O expr ACO_C block
 | FOR ID ASSIGN expr COMA expr block
-| RETURN SEMICOLON
+| RETURN SEMICOLON 
 | RETURN expr SEMICOLON
 | BREAK SEMICOLON
 | CONTINUE SEMICOLON

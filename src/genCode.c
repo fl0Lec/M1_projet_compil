@@ -66,3 +66,49 @@ void afficheGenCode()
         affiche3add(&(genCode.tab[i]));
     }
 }
+
+struct list_addr* creerlist(size_t val)
+{
+    struct list_addr* l=malloc(sizeof(struct list_addr));
+    l->head=l->tail=malloc(sizeof(struct addr));
+    l->head->val=val;
+    l->head->next=0;
+    return l;
+}
+
+void addlist(struct list_addr* l, size_t val)
+{
+    struct addr* e=malloc(sizeof(struct addr));
+    e->val=val;
+    l->tail->next=e;
+    l->tail=e;
+}
+
+struct list_addr* concat(struct list_addr* l1, struct list_addr* l2)
+{
+    l1->tail->next=l2->head;
+    return l1;
+}
+
+void complete(struct list_addr* l, int addr)
+{
+    struct addr* next, *e=l->head;
+    while (e){
+        genCode.tab[e->val].dst=addST_constInt(addr, ADDR);
+        next=e->next;
+        free(e);
+        e=next;
+    }
+}
+
+void completeLabel(struct list_addr* l, struct symbole* s)
+{
+    struct addr* next, *e=l->head;
+    while (e){
+        genCode.tab[e->val].dst=s;
+        next=e->next;
+        free(e);
+        e=next;
+    }
+
+}

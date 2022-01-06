@@ -7,7 +7,7 @@
 
 //les diffferents type
 //TODO string 
-enum type {BOOL_T, INT_T, STRING_T, VOID_T, TEMP};
+enum type {BOOL_T, INT_T, STRING_T, VOID_T, TEMP, ADDR};
 
 //descripteur de fonction
 struct fundesc {
@@ -15,6 +15,7 @@ struct fundesc {
     int capacity;       //capcity = allocated
     enum type* args;    //tableau des argument
     enum type ret;      //valeur de retour
+    struct symTab* context;
 };
 
 //liste chainée d'ID
@@ -53,11 +54,14 @@ void empilerST(void);
 //depile ! a la memoire dynamique
 void depilerST(void);
 
+//initalise la premiere table des symbole avec les fonctions de librairie
+void initST(void);
+
 //ajout une entrée dans la table des symbole
 struct symbole* addST_id(char *id, enum type type);
 struct symbole* addST_constInt(int val, enum type type);
 struct symbole* addST_constStr(char* val);
-struct symbole* addST_fun(char *id, enum type type, struct fundesc*);
+struct symbole* addST_fun(char *id, struct fundesc*);
 struct symbole* addST_temp();
 
 //cherche dans les tables
@@ -85,6 +89,7 @@ static char * const type_names[] = {
 	[BOOL_T] =      "boolean",
     [STRING_T] =    "string",
 	[VOID_T] =      "void",
-    [TEMP] =        "temp"
+    [TEMP] =        "temp",
+    [ADDR] =        "numero ligne"
 };
 #endif

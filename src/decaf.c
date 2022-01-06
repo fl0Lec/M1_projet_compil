@@ -61,14 +61,14 @@ int main(int argc, char** argv)
     
     //initialise table des symboles
     initGenCode();
-    empilerST();
+    initST();
 
     int r = yyparse();
 
     if (r != 0)
         return 1;
 
-    genMips(yyout);
+    //genMips(yyout);
     if (afficher_table)
         afficheAllST();
     printf("\n");
