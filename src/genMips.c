@@ -219,7 +219,7 @@ void genGoto(struct code3add instr, FILE* out)
 // un label par ligne de code à trois adresse
 void genLabel(struct code3add instr, FILE* out)
 {
-    fprintf(out, "line.%s: ", instr.dst->u.id);
+    fprintf(out, "%s: ", instr.dst->u.id);
 }
 
 // génère les fonctions d'entrées et sorties
@@ -251,7 +251,7 @@ void genMips(FILE* out)
     
     genIOFunctions(out);
     
-    fprintf(out, "\n\nmain:\n\n");
+    fprintf(out, "\n\n");
     while(i < genCode.size)
     {
         instr = genCode.tab[i++];
