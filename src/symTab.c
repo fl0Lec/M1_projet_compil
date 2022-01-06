@@ -95,12 +95,6 @@ void initST(void)
     desc->nbArg=1;
     desc->ret=VOID_T;
     desc->args=malloc(sizeof(enum type)*desc->nbArg);
-    desc->args[0]=BOOL_T;
-    addST_fun("WriteBool", desc);
-    desc=malloc(sizeof(struct fundesc));
-    desc->nbArg=1;
-    desc->ret=VOID_T;
-    desc->args=malloc(sizeof(enum type)*desc->nbArg);
     desc->args[0]=STRING_T;
     addST_fun("WriteString", desc);
     

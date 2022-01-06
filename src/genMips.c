@@ -1,7 +1,7 @@
 #include "genMips.h"
 
 // --------------------------------------
-// generation de codde mips par instruction
+// generation de code mips par instruction
 // --------------------------------------
 
 void genLoad(struct code3add instr, FILE* out)
@@ -101,11 +101,11 @@ void genLabel(int line, FILE* out)
 void genIOFunctions(FILE* out)
 {
     // print_string : print string en $a0
-    fprintf(out, "\nprint_string:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    fprintf(out, "\nWriteString:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
     // print_int : print int en $a0
-    fprintf(out, "\nprint_int:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
+    fprintf(out, "\nWriteInt:\n  subu $sp $sp 8\n  sw $ra 0($sp)\n  sw $a0 4($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    lw $a0 4($sp)\n    addu $sp $sp 8\n    jr $ra\n");
     //read_int : read int vers $v0
-    fprintf(out, "\nread_int:\n  li $v0 5\n  syscall\n  jr $ra\n");
+    fprintf(out, "\nReadInt:\n  li $v0 5\n  syscall\n  jr $ra\n");
 }
 
 // --------------------------------------
