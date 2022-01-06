@@ -1,4 +1,7 @@
-// add
+// int
 class Program {
-    int a = 5;
+    void main() {
+        int a;
+        a = 5
+    }
 }

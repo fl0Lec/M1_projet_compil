@@ -1,7 +1,9 @@
 class Program {
 
-	int string;
-	string = '\n';
+    void main() {
+	    int string;
+	    string = '\n';
+	}
 
 }
 

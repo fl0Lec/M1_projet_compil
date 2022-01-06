@@ -1,4 +1,7 @@
 // string
 class Program {
-    string a = "abc";
+    void main ()
+    {
+        WriteString("abc\ndef");
+    }
 }

@@ -1,9 +1,11 @@
 // test des expressions sans structure de controle
 class Program {
-    int nombre;
-    boolean test;
+    void main() {
+        int nombre;
+        boolean test;
 
-    nombre = 4;
-    nombre += 2;
-    nombre = nombre % 2;
+        nombre = 4;
+        nombre += 2;
+        nombre = nombre % 2;
+    }
 }

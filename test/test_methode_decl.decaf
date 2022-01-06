@@ -4,7 +4,7 @@ class Program {
         int i;
     }
 
-    int main(int i){
+    void main(int i){
         int j;
         j=0;
         // TODO genMips pour plus complexe comme :

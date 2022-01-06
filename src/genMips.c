@@ -30,29 +30,154 @@ void genStore(struct code3add instr, FILE* out)
 
 void genAdd(struct code3add instr, FILE* out)
 {
-    fprintf(out, "add %s %s %s\n", instr.dst->u.id, instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "add %s ", instr.dst->u.id);
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d ", instr.arg1->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s ", instr.arg1->u.id);
+    break;
+    default:
+    break;
+    }
+
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d", instr.arg2->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s", instr.arg2->u.id);
+    break;
+    default:
+    break;
+    }
+
+    fprintf(out, "\n");
 }
 
 void genSub(struct code3add instr, FILE* out)
 {
-    fprintf(out, "sub %s %s %s\n", instr.dst->u.id, instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "sub %s ", instr.dst->u.id);
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d ", instr.arg1->u.val);
+    break;
+    case IDENT: case TEMPO: 
+        fprintf(out, "%s ", instr.arg1->u.id);
+    break;
+    default:
+    break;
+    }
+
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d", instr.arg2->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s", instr.arg2->u.id);
+    break;
+    default:
+    break;
+    }
+
+    fprintf(out, "\n");
 }
 
 void genMul(struct code3add instr, FILE* out)
 {
-    fprintf(out, "mult %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "mult ");
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d ", instr.arg1->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s ", instr.arg1->u.id);
+    break;
+    default:
+    break;
+    }
+
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d", instr.arg2->u.val);
+    break;
+    case IDENT:
+        fprintf(out, "%s", instr.arg2->u.id);
+    break;
+    default:
+    break;
+    }
+
+    fprintf(out, "\n");
     fprintf(out, "mflo %s\n", instr.dst->u.id);
 }
 
 void genDivi(struct code3add instr, FILE* out)
 {
-    fprintf(out, "div %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "div ");
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d ", instr.arg1->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s ", instr.arg1->u.id);
+    break;
+    default:
+    break;
+    }
+
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d", instr.arg2->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s", instr.arg2->u.id);
+    break;
+    default:
+    break;
+    }
+
+    fprintf(out, "\n");
     fprintf(out, "mflo %s\n", instr.dst->u.id);
 }
 
 void genMod(struct code3add instr, FILE* out)
 {
-    fprintf(out, "div %s %s\n", instr.arg1->u.id, instr.arg2->u.id);
+    fprintf(out, "div ");
+    switch (instr.arg1->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d ", instr.arg1->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s ", instr.arg1->u.id);
+    break;
+    default:
+    break;
+    }
+
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "%d", instr.arg2->u.val);
+    break;
+    case IDENT: case TEMPO:
+        fprintf(out, "%s", instr.arg2->u.id);
+    break;
+    default:
+    break;
+    }
+
+    fprintf(out, "\n");
     fprintf(out, "mfhi %s\n", instr.dst->u.id);
 }
 
@@ -92,9 +217,9 @@ void genGoto(struct code3add instr, FILE* out)
 }
 
 // un label par ligne de code à trois adresse
-void genLabel(int line, FILE* out)
+void genLabel(struct code3add instr, FILE* out)
 {
-    fprintf(out, "line.%d: ", line);
+    fprintf(out, "line.%s: ", instr.dst->u.id);
 }
 
 // génère les fonctions d'entrées et sorties
@@ -176,6 +301,9 @@ void genMips(FILE* out)
             break;
             case goto_op: 
                 genGoto(instr, out);
+            break;
+            case label: 
+                genLabel(instr, out);
             break;
             default:
                 fprintf(stderr, "operation non reconnue\n");
