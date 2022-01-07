@@ -13,7 +13,7 @@ void genLoad(struct code3add instr, FILE* out)
 void genLoadimm(struct code3add instr, FILE* out)   // TODO gerer si > 16 bits
 {
     fprintf(out, "\n# load immediate\n");
-    fprintf(out, "lui %s, %d\n", instr.dst->u.id, instr.arg1->u.val);
+    fprintf(out, "li %s, %d\n", instr.dst->u.id, instr.arg1->u.val);
 }
 
 // load les arguments pour une opération basique (add, sub...)
@@ -21,7 +21,7 @@ void genLoadForOP(struct code3add instr, FILE* out) {
     switch (instr.arg1->kind)
     {
     case CST_INT:
-        fprintf(out, "lui $t0 %d\n", instr.arg1->u.val);
+        fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     default:
         fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
@@ -31,7 +31,7 @@ void genLoadForOP(struct code3add instr, FILE* out) {
     switch (instr.arg2->kind)
     {
     case CST_INT:
-        fprintf(out, "lui $t1 %d\n", instr.arg2->u.val);
+        fprintf(out, "li $t1 %d\n", instr.arg2->u.val);
     break;
     default:
         fprintf(out, "lw $t1 %d($sp)\n", instr.arg2->location);
@@ -44,7 +44,7 @@ void genStore(struct code3add instr, FILE* out)
     switch (instr.arg1->kind)
     {
     case CST_INT:
-        fprintf(out, "lui $t0, %d\n", instr.arg1->u.val);
+        fprintf(out, "li $t0, %d\n", instr.arg1->u.val);
         fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
         break;
     default:
@@ -145,7 +145,8 @@ void genGoto(struct code3add instr, FILE* out)
 void genLabel(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n%s:\n", instr.dst->u.id);
-    fprintf(out, "addiu $sp, $sp, -4\nsw $ra, ($sp)\n"); // save return pointer
+    fprintf(out, "addiu $sp, $sp, -%d\n", instr.dst->table->lastloc);
+    fprintf(out, "addiu $sp, $sp, -4\nsw $ra, 0($sp)\n"); // save return pointer
 }
 
 void genReturn(struct code3add instr, FILE* out)
@@ -163,20 +164,20 @@ void genParam(struct code3add instr, FILE* out)
     switch (instr.arg1->kind)
     {
     case CST_INT:
-        fprintf(out, "lui $t0 %d\n", instr.arg1->u.val);
+        fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     default:
         fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
     }
-    fprintf(out, "sw $t0, ($sp)\n");
+    fprintf(out, "sw $t0, 0($sp)\n");
 }
 
 void genCall(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# call\n");
     fprintf(out, "jal %s\n", instr.arg1->u.id);
-    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->nbArg*4+4); // delete parameters & return pointer
+    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->table->lastloc+4);
     if (instr.dst != NULL) {
         fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location);
     }
@@ -186,11 +187,11 @@ void genCall(struct code3add instr, FILE* out)
 void genIOFunctions(FILE* out)
 {
     // print_string : print string en $a0
-    fprintf(out, "\nWriteString:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  lui $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n   jr $ra\n");
+    fprintf(out, "\nWriteString:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n   jr $ra\n");
     // print_int : print int en $a0
-    fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  lui $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    jr $ra\n");
+    fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    jr $ra\n");
     //read_int : read int vers $v0
-    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 0($sp)\n  jr $ra\n");
+    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  jr $ra\n");
 }
 
 // --------------------------------------

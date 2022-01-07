@@ -20,6 +20,6 @@ class Program {
             int j;
         }
         compteur = j;
-        WriteInt(i);
+        WriteInt(4);
     }
 }

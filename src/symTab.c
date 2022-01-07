@@ -125,8 +125,9 @@ struct symbole* addST_id(char *id, enum type type)
     s->u.id=malloc(sizeof(char)*strlen(id));
     strcpy(s->u.id, id);
     s->type.type=type;
-    s->location=symTab->lastloc;
     symTab->lastloc+=allignement(TEMP);
+    s->location=symTab->lastloc;
+    s->table = symTab;
     return s; 
 }
 
@@ -138,9 +139,9 @@ struct symbole* addST_temp()
     s->u.id=malloc(sizeof(char)*(1+sizeof(size_t)));
     s->u.id[0]='t';
     sprintf(s->u.id+1, "%ld", symTab->nbTemp++);
+    symTab->lastloc+=allignement(TEMP);
     s->location=symTab->lastloc;
     s->table = symTab;
-    symTab->lastloc+=allignement(TEMP);
     return s; 
 }
 
