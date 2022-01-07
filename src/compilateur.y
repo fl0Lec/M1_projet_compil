@@ -112,6 +112,7 @@ void error(char* msg)
 %type <assign_op_type> assign_op
 
 %type <id> method_call
+%type <fundesc> method_call_args
 
 %type<fundesc> method_decl_param
 
@@ -231,7 +232,7 @@ location assign_op expr SEMICOLON {
         }
     }
 }
-| method_call SEMICOLON
+| method_call SEMICOLON {gencode(call, $1, NULL, NULL);}
 | IF PAR_O expr PAR_C block ELSE block
 | IF PAR_O expr PAR_C block
 | FOR ID ASSIGN expr COMA expr block
@@ -268,25 +269,33 @@ location
 
 method_call
 : ID PAR_O PAR_C {
-    struct symbole* t=newtemp();
-    t->type.desc=initfun();
-    $$=t;
+    struct symbole* s=lookupST($1);
+    if (!s || s->kind!=FUN || s->type.desc->nbArg!=0)
+        error("erreur appel fonction nom ou pas d'argument");
+    $$=s;
 }   // procédure
 | ID PAR_O method_call_args PAR_C {
-    struct symbole* t=newtemp();
-    t->type.desc=initfun();
-    $$=t;
+    struct symbole* s=lookupST($1);
+    if (!compfundesc(s->type.desc, $3))
+        error("erreur argument different");
+    $$=s;
+    
 } // fonction
 ;
 
 method_call_args
-: method_call_args COMA
-| expr
+: method_call_args COMA expr {$$=$1; addtypefd($$, $3->type.type); gencode(param, NULL, NULL, $3);}
+| expr {$$=initfun(); addtypefd($$, $1->type.type); gencode(param, NULL, NULL, $1);}
 ;
 
 expr
 : location  {$$=$1;}
-| method_call {$$=$1;}
+| method_call {
+    if ($1->type.desc->ret==VOID_T)
+        error("fonction sans retour dans expression");
+    $$=newtemp();
+    gencode(call, $1, NULL, $$);
+}
 | literal   {$$=$1;}
 | expr bin_op expr {//shif reduce ici
     struct symbole* t=newtemp();

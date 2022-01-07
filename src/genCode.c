@@ -63,6 +63,7 @@ void afficheGenCode()
 {
     printf("gencode nb line : %d\n", genCode.size);
     for (size_t i=0; i<genCode.size; i++){
+        printf("line %ld :\t", i);
         affiche3add(&(genCode.tab[i]));
     }
 }

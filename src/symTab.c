@@ -1,4 +1,6 @@
 #include "symTab.h"
+#include "genCode.h"
+
 #define TAILLE_INIT 64
 //sur quelle valeur un type doit être aligné en mémoire
 size_t allignement(enum type t){
@@ -106,6 +108,7 @@ void check_idST(char* str){
         if ((s->kind==IDENT || s->kind==TAB || s->kind==FUN) && strcmp(str, s->u.id)==0){
             fprintf(stderr, "impossible identifiant : %s deja present\n", str);
             afficherST();
+            afficheGenCode();
             exit(-1);
         }
 
@@ -191,6 +194,17 @@ void addtypefd(struct fundesc* fd, enum type t)
         fd->args=realloc(fd->args, sizeof(enum type)*fd->capacity);
     }
     fd->args[fd->nbArg++]=t;
+}
+
+int compfundesc(struct fundesc* f1, struct fundesc* f2)
+{
+    if (f1->nbArg!=f2->nbArg)
+        return 0;
+    for (int i=0; i<f1->nbArg; i++){
+        if (f1->args[i]!=f2->args[i])
+            return 0;
+    }
+    return 1;
 }
 /////////////////////////////////////////////////////
 struct symbole* lookupST(char *id)

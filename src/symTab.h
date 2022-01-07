@@ -72,8 +72,12 @@ void afficheSymb(struct symbole*);
 void afficherST(void);
 void afficheAllST(void);
 
+//initalise un descripteur de fonction avec zero argument
 struct fundesc* initfun();
+//ajout un argument dans le descipteur de fonction
 void addtypefd(struct fundesc*, enum type);
+//compare duex fundesc si les argument on le meme type 1 si ok 0 sinon
+int compfundesc(struct fundesc*, struct fundesc*);
 
 static char * const kind_names[] = {
     [TEMPO] =   "temp",
