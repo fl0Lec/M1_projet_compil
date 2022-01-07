@@ -341,6 +341,15 @@ void genMips(FILE* out)
             case label: 
                 genLabel(instr, out);
             break;
+            case call: 
+                genCall(instr, out);
+            break;
+            case ret: 
+                genReturn(instr, out);
+            break;
+            case param: 
+                genParam(instr, out);
+            break;
             default:
                 fprintf(stderr, "operation non reconnue\n");
             break;
