@@ -57,7 +57,7 @@ void empilerST(void)
     s->capacity=TAILLE_INIT;
     s->symb=malloc(sizeof(struct symbole)*TAILLE_INIT);
     s->nbTemp=0;
-    s->lastloc=0;
+    s->lastloc=(symTab==NULL||symTab->prev==NULL?0:symTab->lastloc);
     s->size_fils = 0;
     s-> capacity_fils = TAILLE_INIT;
     s->fils=malloc(sizeof(struct symTab *)*TAILLE_INIT);

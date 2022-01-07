@@ -145,7 +145,9 @@ type ID add_id_imm SEMICOLON declaration
     struct symbole *s=addST_fun($2, $5); 
     completeLabel($4, s);}
 ;
+
 add_id_imm : %empty {addST_id(yylval.mot, last_type);}
+;
 
 empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
@@ -182,6 +184,7 @@ method_decl : VOID_TYPE ID empile_fun PAR_O method_decl_param PAR_C block {
     $5->ret=$1;
     struct symbole* s=addST_fun($2, $5); 
     completeLabel($3, s);}
+;
 
 method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->capacity=0;$$->args=0;}
 |method_decl_param COMA type ID {
@@ -203,8 +206,14 @@ method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->cap
 }
 ;
 
-block : ACO_O list_field_decl list_statement ACO_C
+block : ACO_O empile list_field_decl list_statement  depile ACO_C
+;
 
+empile : %empty {empilerST();}
+;
+
+depile : %empty {depilerST();}
+;
 
 list_statement : %empty
 | statement list_statement
