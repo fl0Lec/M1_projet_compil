@@ -72,8 +72,15 @@ goto dst if arg1 >= arg2
 ## goto_op
 goto dst
 
+
 ## label
 dst : est le nom du label (fonction)
 
-##ret 
+## ret 
 return dst 
+
+## param 
+param arg1 
+
+## call
+call arg1 -> dst : (dans dst seulement si dans expression et fonction a valeur de retour)

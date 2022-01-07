@@ -284,8 +284,8 @@ method_call
 ;
 
 method_call_args
-: method_call_args COMA expr {$$=$1; addtypefd($$, $3->type.type); gencode(param, NULL, NULL, $3);}
-| expr {$$=initfun(); addtypefd($$, $1->type.type); gencode(param, NULL, NULL, $1);}
+: method_call_args COMA expr {$$=$1; addtypefd($$, $3->type.type); gencode(param, $3, NULL, NULL);}
+| expr {$$=initfun(); addtypefd($$, $1->type.type); gencode(param, $1, NULL, NULL);}
 ;
 
 expr
