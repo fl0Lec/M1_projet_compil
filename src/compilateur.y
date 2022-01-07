@@ -159,7 +159,7 @@ list_field_decl : %empty {}
 
 liste_id: %empty {}
 | ID add_id_imm 
-| liste_id COMA ID add_id_imm
+| ID add_id_imm COMA liste_id
 ;
 
 list_method_decl : %empty
@@ -245,7 +245,7 @@ location assign_op expr SEMICOLON {
         //reste a faire different assign_op
         switch ($2) {
             case ADD_ASSIGN:
-                gencode(add, $1, $3, $1);   // peut être loadtmp puis store
+                gencode(add, $1, $3, $1);
             break;
             case SUB_ASSIGN:
                 gencode(sub, $1, $3, $1);

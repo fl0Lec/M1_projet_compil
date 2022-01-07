@@ -33,6 +33,7 @@ struct symbole {
     } type;
     int location;           //emplacement memoire (comment faire pour fonction ? -1 ?)
     struct list_addr *true, *false; //quand expression boolean
+    struct symTab* table;    // la table qui le contient
 };
 
 struct symTab {
