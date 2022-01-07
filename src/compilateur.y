@@ -158,7 +158,7 @@ list_field_decl : %empty {}
 
 liste_id: %empty {}
 | ID add_id_imm 
-| liste_id COMA ID add_id_imm
+| ID add_id_imm COMA liste_id
 ;
 
 list_method_decl : %empty
