@@ -223,9 +223,12 @@ statement :
 location assign_op expr SEMICOLON {
     //verifie que l'on a bien location et expr
     if (!$1)
-        printf("location wrong\n");
+        error("location NULL\n");
     if (!$3)
-        printf("expr wrong\n");
+        error("expr NULL\n");
+    if ($1->type.type!=$3->type.type){
+        error("assignement entre variable de different type");
+    }
     else {
         //reste a faire different assign_op
         switch ($2) {
@@ -303,6 +306,7 @@ expr
     if ($1->type.desc->ret==VOID_T)
         error("fonction sans retour dans expression");
     $$=newtemp();
+    $$->type.type=$1->type.desc->ret;
     gencode(call, $1, NULL, $$);
 }
 | literal   {$$=$1;}
@@ -310,6 +314,7 @@ expr
     struct symbole* t=newtemp();
     //switch sur les differentes operations binaires
     switch($2){
+        //arith_op
         case add:
         case sub:
         case mul:
@@ -320,6 +325,20 @@ expr
             t->type.type=INT_T;
             gencode($2, $1, $3, t);
             break;
+        //rel_op et eq_op
+        case inf:
+        case infeq:
+        case sup:
+        case supeq:
+        case eq:
+        case noteq:
+            if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+                error("erreur de type doit être de type int");
+            t->type.type=BOOL_T;
+            gencode($2, $1, $3, t);
+            break;
+
+
         default :
             break;
     }

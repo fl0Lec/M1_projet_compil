@@ -5,11 +5,18 @@ class Program {
         return a+b;
     }
 
-    int main(int i){
-        int j;
+    int main(){
+        int i, j;
         i = addval(i, j);
         // TODO genMips pour plus complexe comme :
         compteur = (8*j)+10;
+        {
+            int i;
+            i=0;
+        }
+        {
+            int j;
+        }
         compteur = j;
         return 0;
     }
