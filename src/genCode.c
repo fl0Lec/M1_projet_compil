@@ -92,6 +92,7 @@ struct list_addr* concat(struct list_addr* l1, struct list_addr* l2)
     if (!l2)
         return l1;
     l1->tail->next=l2->head;
+    l1->tail=l2->tail;
     return l1;
 }
 
@@ -115,5 +116,16 @@ void completeLabel(struct list_addr* l, struct symbole* s)
         free(e);
         e=next;
     }
+}
 
+void afficheLA(struct list_addr* l)
+{
+    struct addr* e=l->head;
+    while (e)
+    {
+        printf("%ld - ", e->val);
+        e=e->next;
+    }
+    printf("\n");
+    
 }

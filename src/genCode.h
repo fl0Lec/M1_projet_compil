@@ -82,5 +82,8 @@ void complete(struct list_addr*, int);
 
 //compele la fonction quand label
 void completeLabel(struct list_addr*, struct symbole*);
+
+//affiche list addr
+void afficheLA(struct list_addr* l);
 #endif
 

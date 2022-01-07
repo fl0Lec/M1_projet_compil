@@ -17,6 +17,8 @@ enum type last_type;
 void error(char* msg)
 {
     fprintf(stderr, "%s\n", msg);
+    afficheGenCode();
+    afficheAllST();
     exit(-1);
 }
 /**
@@ -59,8 +61,18 @@ void error(char* msg)
 %token ASSIGN_PLUS
 %token ASSIGN_SUB
 
+/* BOOLEAN OPERATIONS */
+%token INF_EQ
+%token SUP_EQ
+%token INF
+%token SUP
+%token EQ
+%token NOT_EQ
+%left OR
+%left AND
+
 /* OPERATIONS et EXPRESSIONS */
-%nonassoc USUB // unaire
+
 %left PLUS
 %left SUB
 %left MULT
@@ -73,15 +85,6 @@ void error(char* msg)
 %token ACO_C
 %token COMA
 
-/* BOOLEAN OPERATIONS */
-%token INF_EQ
-%token SUP_EQ
-%token INF
-%token SUP
-%token EQ
-%token NOT_EQ
-%left OR
-%left AND
 
 /* CONTROL STRUCTURES */
 %token IF
@@ -364,8 +367,18 @@ expr
         case or :
             if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
                 error("erreur de type doit etre de type expression bool");
+            complete($1->false, $3);
+            printf("$1\n");
+            afficheLA($1->true);
+            afficheLA($1->false);
+            printf("$4\n");
+            afficheLA($4->true);
+            afficheLA($4->false);
             $$=$4;
             $$->true=concat($$->true, $1->true);
+            printf("$$\n");
+            afficheLA($$->true);
+            afficheLA($$->false);
 
         default :
             break;
