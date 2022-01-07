@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     if (r != 0)
         return 1;
 
-    genMips(yyout);
+    //genMips(yyout);
     if (afficher_table)
         afficheAllST();
     printf("\n");

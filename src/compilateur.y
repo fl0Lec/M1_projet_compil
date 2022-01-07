@@ -122,6 +122,8 @@ void error(char* msg)
 
 %type <list_addr> empile_fun
 
+%type <val> else_bloc
+
 %start program
 
 %%
@@ -260,8 +262,14 @@ location assign_op expr SEMICOLON {
     }
 }
 | method_call SEMICOLON {gencode(call, $1, NULL, NULL);}
-| IF PAR_O expr PAR_C block ELSE block
-| IF PAR_O expr PAR_C block
+| IF PAR_O expr PAR_C next_ligne block else_bloc {
+    afficheLA($3->true);
+    afficheLA($3->false);
+    complete($3->true, $5);
+    printf("%d\n", $7);
+
+    complete($3->false, ($7==-1?genCode.size:$7));
+}
 | FOR ID ASSIGN expr COMA expr block
 | RETURN SEMICOLON {gencode(ret, NULL, NULL, NULL);}
 | RETURN expr SEMICOLON {gencode(ret, NULL, NULL, $2);}
@@ -269,6 +277,9 @@ location assign_op expr SEMICOLON {
 | CONTINUE SEMICOLON
 | block
 ;
+
+else_bloc : %empty {$$=-1;}
+| ELSE next_ligne block {$$=$2;}
 
 type 
 : INT_TYPE {$$ = INT_T; last_type = $$;}
