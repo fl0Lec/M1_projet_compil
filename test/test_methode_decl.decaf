@@ -12,6 +12,13 @@ class Program {
         i = addval(i, j);
         // TODO genMips pour plus complexe comme :
         compteur = (8*j)+10;
+        {
+            int i;
+            i=0;
+        }
+        {
+            int j;
+        }
         compteur = j;
     }
 }
