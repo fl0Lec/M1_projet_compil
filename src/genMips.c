@@ -233,13 +233,13 @@ void genParam(struct code3add instr, FILE* out)
 {
     fprintf(out, "# param\n");
     fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter
-    switch (instr.dst->kind)
+    switch (instr.arg1->kind)
     {
     case CST_INT:
-        fprintf(out, "li $t0 %d\n", instr.dst->u.val);
+        fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     case IDENT: case TEMPO:
-        fprintf(out, "la $t0 %s\n", instr.dst->u.id);
+        fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
     break;
     default:
     break;
