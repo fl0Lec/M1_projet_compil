@@ -255,8 +255,8 @@ location assign_op expr SEMICOLON {
     if ($1->type.type==BOOL_T){
         complete($3->true, genCode.size);
         complete($3->false, genCode.size+1);
-        gencode(store, $3, NULL, addST_constInt(1, INT_T));
-        gencode(store, $3, NULL, addST_constInt(0, INT_T));
+        gencode(store, addST_constInt(1, INT_T), NULL, $1);
+        gencode(store, addST_constInt(0, INT_T), NULL, $1);
     }
     else {
         //reste a faire different assign_op
@@ -396,26 +396,52 @@ expr
             $$=t;
             break;
         case and:
+            if (($1->kind==IDENT) && ($1->type.type=BOOL_T)){
+                struct symbole* s=addST_exprbool();
+                s->true=creerlist(genCode.size);
+                s->false=creerlist(genCode.size+1);
+                gencode(eq, $1, addST_constInt(1, INT_T),0);
+                gencode(goto_op, 0, 0, 0);
+                $1=s;
+            }
+            if (($4->kind==IDENT) && ($4->type.type=BOOL_T)){
+                struct symbole* s=addST_exprbool();
+                s->true=creerlist(genCode.size);
+                s->false=creerlist(genCode.size+1);
+                gencode(eq, $4, addST_constInt(1, INT_T),0);
+                gencode(goto_op, 0, 0, 0);
+                $4=s;
+            }
             if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
-                error("erreur de type doit etre de type expression bool");
+                error("erreur de type doit etre de type expression bool ou boolean");
             complete($1->true, $3);
             $$=$4;
             $$->false=concat($4->false, $1->false);
         case or :
-            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
+            if (($1->kind==IDENT) && ($1->type.type=BOOL_T)){
+                struct symbole* s=addST_exprbool();
+                s->true=creerlist(genCode.size);
+                s->false=creerlist(genCode.size+1);
+                gencode(eq, $1, addST_constInt(1, INT_T),0);
+                gencode(goto_op, 0, 0, 0);
+                $1=s;
+            }
+            if (($4->kind!=FUN) && ($4->type.type==BOOL_T)){
+                struct symbole* s=addST_exprbool();
+                s->true=creerlist(genCode.size);
+                s->false=creerlist(genCode.size+1);
+                gencode(eq, $4, addST_constInt(1, INT_T),0);
+                gencode(goto_op, 0, 0, 0);
+                $4=s;
+            }
+            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B){
+                afficheSymb($1);
+                afficheSymb($4);
                 error("erreur de type doit etre de type expression bool");
+            }
             complete($1->false, $3);
-            printf("$1\n");
-            afficheLA($1->true);
-            afficheLA($1->false);
-            printf("$4\n");
-            afficheLA($4->true);
-            afficheLA($4->false);
             $$=$4;
             $$->true=concat($$->true, $1->true);
-            printf("$$\n");
-            afficheLA($$->true);
-            afficheLA($$->false);
 
         default :
             break;
@@ -427,7 +453,24 @@ expr
     if (!$2 || $2->type.type!=INT_T)
         error("erreur de type doit être int");
     gencode(subun, $2, 0, $$);}
-| NOT expr  {$$=NULL;}
+| NOT expr  {
+    struct symbole *t;
+    if ($2->kind==EXPR_B){
+    struct list_addr *la=$2->true;
+    $$=$2;
+    $$->true=$$->false;
+    $$->false=la;
+    }
+    else if ($2->kind!=IDENT && $2->type.type!=BOOL_T){
+        t=addST_exprbool();
+        t->true=creerlist(genCode.size+1);
+        t->false=creerlist(genCode.size);
+        gencode(eq, $2, addST_constInt(1, INT_T), NULL);
+        gencode(goto_op, NULL, NULL, NULL);
+    }
+    else 
+        error("\"!\" attend une expression boolean");
+}
 | PAR_O expr PAR_C  {$$=$2;}
 ;
 
