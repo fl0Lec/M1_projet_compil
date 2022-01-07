@@ -87,6 +87,10 @@ void addlist(struct list_addr* l, size_t val)
 
 struct list_addr* concat(struct list_addr* l1, struct list_addr* l2)
 {
+    if (!l1)
+        return l2;
+    if (!l2)
+        return l1;
     l1->tail->next=l2->head;
     return l1;
 }

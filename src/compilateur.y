@@ -110,6 +110,7 @@ void error(char* msg)
 %type <op> arith_op
 %type <op> bin_op
 %type <assign_op_type> assign_op
+%type <val> next_ligne
 
 %type <id> method_call
 %type <fundesc> method_call_args
@@ -226,8 +227,19 @@ location assign_op expr SEMICOLON {
         error("location NULL\n");
     if (!$3)
         error("expr NULL\n");
-    if ($1->type.type!=$3->type.type){
+    if ($1->type.type==BOOL_T && $3->kind!=EXPR_B)
+        error("assignement entre variable bool et expression bool");
+    else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type){
+        afficheSymb($1);
+        afficheSymb($3);
         error("assignement entre variable de different type");
+    }
+    
+    if ($1->type.type==BOOL_T){
+        complete($3->true, genCode.size);
+        complete($3->false, genCode.size+1);
+        gencode(store, $3, NULL, addST_constInt(1, INT_T));
+        gencode(store, $3, NULL, addST_constInt(0, INT_T));
     }
     else {
         //reste a faire different assign_op
@@ -310,8 +322,8 @@ expr
     gencode(call, $1, NULL, $$);
 }
 | literal   {$$=$1;}
-| expr bin_op expr {//shif reduce ici
-    struct symbole* t=newtemp();
+| expr bin_op next_ligne expr {//shif reduce ici
+    struct symbole* t;
     //switch sur les differentes operations binaires
     switch($2){
         //arith_op
@@ -319,11 +331,13 @@ expr
         case sub:
         case mul:
         case divi:
-        case mod:
-            if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        case mod: ;
+            t=newtemp();
+            if (!$1 || $1->type.type!=INT_T || !$4 || $4->type.type!=INT_T)
                 error("erreur de type doit être de type int");
             t->type.type=INT_T;
-            gencode($2, $1, $3, t);
+            gencode($2, $1, $4, t);
+            $$=t;
             break;
         //rel_op et eq_op
         case inf:
@@ -331,18 +345,31 @@ expr
         case sup:
         case supeq:
         case eq:
-        case noteq:
-            if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        case noteq: ;
+            t=addST_exprbool();
+            if (!$1 || $1->type.type!=INT_T || !$4 || $4->type.type!=INT_T)
                 error("erreur de type doit être de type int");
-            t->type.type=BOOL_T;
-            gencode($2, $1, $3, t);
+            t->true=creerlist(genCode.size);
+            t->false=creerlist(genCode.size+1);
+            gencode($2, $1, $4, NULL);
+            gencode(goto_op, NULL, NULL, NULL);
+            $$=t;
             break;
-
+        case and:
+            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
+                error("erreur de type doit etre de type expression bool");
+            complete($1->true, $3);
+            $$=$4;
+            $$->false=concat($4->false, $1->false);
+        case or :
+            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
+                error("erreur de type doit etre de type expression bool");
+            $$=$4;
+            $$->true=concat($$->true, $1->true);
 
         default :
             break;
     }
-    $$=t;
 }
 | SUB expr {
     $$=newtemp();
@@ -352,6 +379,9 @@ expr
     gencode(subun, $2, 0, $$);}
 | NOT expr  {$$=NULL;}
 | PAR_O expr PAR_C  {$$=$2;}
+;
+
+next_ligne : %empty {$$=genCode.size;}
 ;
 
 bin_op
@@ -382,8 +412,8 @@ eq_op
 ;
 
 cond_op
-: OR {}
-| AND {}
+: OR {$$=or;}
+| AND {$$=and;}
 ;
 
 literal

@@ -5,7 +5,7 @@
 
 
 enum Operation {load, loadimm, store, add, sub, mul, divi, mod, subun,
-                eq, noteq, inf, infeq, sup, supeq, goto_op, 
+                eq, noteq, inf, infeq, sup, supeq, goto_op, and, or, //and et or ne se retrouve pas dans genCode
                 param, call, label, ret};
 
 enum Assign_op_type {NORMAL_ASSIGN, ADD_ASSIGN, SUB_ASSIGN};
@@ -26,6 +26,8 @@ static char * const op_names[] = {
     [sup] =     "sup", 
     [supeq] =   "supeq",
     [goto_op] = "goto_op",
+    [and] =     "and",
+    [or]  =     "or",
     [param] =   "parametre",
     [call] =    "call",
     [label] =   "label",

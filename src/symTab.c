@@ -143,6 +143,15 @@ struct symbole* addST_temp()
     return s; 
 }
 
+struct symbole* addST_exprbool()
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=EXPR_B;
+    s->type.type=VOID_T;
+    return s;
+}
+
 struct symbole* addST_constInt(int val, enum type type)
 {
     checksize(symTab);
@@ -249,6 +258,9 @@ void afficheSymb(struct symbole* s)
         for (int i=0;i<s->type.desc->nbArg;i++)
             printf("%s, ", type_names[s->type.desc->args[i]]);
         printf("]");
+        break;
+    default:
+        ;
         break;
     }
     printf("\n");
