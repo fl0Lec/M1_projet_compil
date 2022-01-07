@@ -6,19 +6,19 @@
 
 void genLoad(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# load\n");
+    fprintf(out, "\n# load\n");
     fprintf(out, "la %s, %s\n", instr.dst->u.id, instr.arg1->u.id);
 }
 
 void genLoadimm(struct code3add instr, FILE* out)   // TODO gerer si > 16 bits
 {
-    fprintf(out, "# load immediate\n");
+    fprintf(out, "\n# load immediate\n");
     fprintf(out, "li %s, %d\n", instr.dst->u.id, instr.arg1->u.val);
 }
 
 void genStore(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# store\n");
+    fprintf(out, "\n# store\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -34,7 +34,7 @@ void genStore(struct code3add instr, FILE* out)
 
 void genAdd(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# add\n");
+    fprintf(out, "\n# add\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -63,7 +63,7 @@ void genAdd(struct code3add instr, FILE* out)
 
 void genSub(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# sub\n");
+    fprintf(out, "\n# sub\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -92,7 +92,7 @@ void genSub(struct code3add instr, FILE* out)
 
 void genMul(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# mult\n");
+    fprintf(out, "\n# mult\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -122,7 +122,7 @@ void genMul(struct code3add instr, FILE* out)
 
 void genDivi(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# div\n");
+    fprintf(out, "\n# div\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -152,7 +152,7 @@ void genDivi(struct code3add instr, FILE* out)
 
 void genMod(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# mod\n");
+    fprintf(out, "\n# mod\n");
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -223,7 +223,7 @@ void genLabel(struct code3add instr, FILE* out)
 
 void genReturn(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# return\n");
+    fprintf(out, "\n# return\n");
     fprintf(out, "la $v0, %s\n", instr.dst->u.id); // return value in v0
     fprintf(out, "lw $ra, ($sp)\n");    // load return pointer
     fprintf(out, "jr $ra\n\n");
@@ -231,7 +231,7 @@ void genReturn(struct code3add instr, FILE* out)
 
 void genParam(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# param\n");
+    fprintf(out, "\n# param\n");
     fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter
     switch (instr.arg1->kind)
     {
@@ -249,7 +249,7 @@ void genParam(struct code3add instr, FILE* out)
 
 void genCall(struct code3add instr, FILE* out)
 {
-    fprintf(out, "# call\n");
+    fprintf(out, "\n# call\n");
     fprintf(out, "li $a0 %d\n", instr.arg1->type.desc->nbArg);
     fprintf(out, "addiu $sp, $sp, -4\nsw $ra, ($sp)\n"); // save return pointer
     fprintf(out, "jal %s\n", instr.arg1->u.id);
