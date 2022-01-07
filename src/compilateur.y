@@ -233,7 +233,7 @@ location assign_op expr SEMICOLON {
         //reste a faire different assign_op
         switch ($2) {
             case ADD_ASSIGN:
-                gencode(add, $1, $3, $1);   // peut être loadtmp puis store
+                gencode(add, $1, $3, $1);
             break;
             case SUB_ASSIGN:
                 gencode(sub, $1, $3, $1);
