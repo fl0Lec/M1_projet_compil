@@ -23,7 +23,7 @@ void genStore(struct code3add instr, FILE* out)
     {
     case CST_INT:
         fprintf(out, "li $t0, %d\n", instr.arg1->u.val);
-        fprintf(out, "sw $t0, %s \n", instr.dst->u.id);
+        fprintf(out, "sw $t0, %s\n", instr.dst->u.id);
         break;
     default:
         
@@ -215,7 +215,6 @@ void genGoto(struct code3add instr, FILE* out)
     fprintf(out, "j %s\n", instr.dst->u.id);
 }
 
-// un label par ligne de code à trois adresse
 void genLabel(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n%s:\n", instr.dst->u.id);
@@ -253,8 +252,7 @@ void genCall(struct code3add instr, FILE* out)
     fprintf(out, "li $a0 %d\n", instr.arg1->type.desc->nbArg);
     fprintf(out, "addiu $sp, $sp, -4\nsw $ra, ($sp)\n"); // save return pointer
     fprintf(out, "jal %s\n", instr.arg1->u.id);
-    fprintf(out, "addiu $sp, $sp, 4\n"); // delete return pointer
-    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->nbArg*4); // delete parameters
+    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->nbArg*4+4); // delete parameters & return pointer
     if (instr.dst != NULL)
         fprintf(out, "la %s, $v0\n", instr.dst->u.id);
 }
@@ -276,7 +274,9 @@ void genMips(FILE* out)
     int i = 0;
     struct code3add instr;
     struct symbole s;
+
     fprintf(out, "#start program\n");
+
     fprintf(out, "\n.data\n");
     for (size_t i=0;i<symTab->size;i++){
         s=symTab->symb[i];
