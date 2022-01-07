@@ -77,10 +77,10 @@ goto dst
 dst : est le nom du label (fonction)
 
 ## ret 
-return dst 
+return dst
 
 ## param 
-param arg1 
+param arg1
 
 ## call
 call arg1 -> dst : (dans dst seulement si dans expression et fonction a valeur de retour)
