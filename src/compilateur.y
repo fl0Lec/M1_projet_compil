@@ -21,6 +21,13 @@ void error(char* msg)
     afficheAllST();
     exit(-1);
 }
+
+struct comb 
+{
+    struct list_addr* la;
+    int quad;
+};
+
 /**
  *  fonctions à utiliser dans le code des grammaires
  */
@@ -36,7 +43,8 @@ void error(char* msg)
 }
 
 %union {int val; char* mot; enum type type; struct tab* tabID; struct symbole* id; 
-        enum Operation op; struct fundesc* fundesc; struct list_addr* list_addr; enum Assign_op_type assign_op_type; }
+        enum Operation op; struct fundesc* fundesc; struct list_addr* list_addr; enum Assign_op_type assign_op_type;
+        struct comb* comb;}
         
 %token SEMICOLON
 
@@ -122,7 +130,10 @@ void error(char* msg)
 
 %type <list_addr> empile_fun
 
-%type <val> else_bloc
+%type <comb> else_bloc
+%type <comb> genGoto
+
+%type <list_addr> block statement list_statement
 
 %start program
 
@@ -212,7 +223,7 @@ method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->cap
 }
 ;
 
-block : ACO_O empile list_field_decl list_statement  depile ACO_C
+block : ACO_O empile list_field_decl list_statement  depile ACO_C {$$=$4;}
 ;
 
 empile : %empty {empilerST();}
@@ -221,12 +232,13 @@ empile : %empty {empilerST();}
 depile : %empty {depilerST();}
 ;
 
-list_statement : %empty
-| statement list_statement
+list_statement : %empty {$$=NULL;}
+| statement list_statement {$$=concat($1, $2);}
 ;
 
 statement : 
 location assign_op expr SEMICOLON {
+    $$=NULL;
     //verifie que l'on a bien location et expr
     if (!$1)
         error("location NULL\n");
@@ -263,24 +275,38 @@ location assign_op expr SEMICOLON {
 }
 | method_call SEMICOLON {gencode(call, $1, NULL, NULL);}
 | IF PAR_O expr PAR_C next_ligne block else_bloc {
+    $$=$6;
     afficheLA($3->true);
     afficheLA($3->false);
     complete($3->true, $5);
-    printf("%d\n", $7);
+    //printf("%d\n", $7);
+    if ($7){
+        complete($3->false, $7->quad);
+        complete($7->la, genCode.size);
 
-    complete($3->false, ($7==-1?genCode.size:$7));
+    } else {
+        complete($3->false, genCode.size);
+    } 
+
 }
-| FOR ID ASSIGN expr COMA expr block
-| RETURN SEMICOLON {gencode(ret, NULL, NULL, NULL);}
-| RETURN expr SEMICOLON {gencode(ret, NULL, NULL, $2);}
-| BREAK SEMICOLON
-| CONTINUE SEMICOLON
+| FOR ID ASSIGN expr COMA expr block {$$=NULL;}
+| RETURN SEMICOLON      {$$=NULL;gencode(ret, NULL, NULL, NULL);}
+| RETURN expr SEMICOLON {$$=NULL;gencode(ret, NULL, NULL, $2);}
+| BREAK SEMICOLON       {$$=creerlist(genCode.size); gencode(goto_op, 0,0,0);}
+| CONTINUE SEMICOLON    {$$=NULL;}
 | block
 ;
 
-else_bloc : %empty {$$=-1;}
-| ELSE next_ligne block {$$=$2;}
+else_bloc : %empty {$$=0;}
+| ELSE genGoto next_ligne block {
+    $$=$2;
+    $$->la=concat($$->la, $4);
+    $$->quad=genCode.size;
+    }
+;
 
+genGoto : %empty {$$=malloc(sizeof(struct comb)); $$->la=creerlist(genCode.size); gencode(goto_op, 0, 0, 0);}
+;
 type 
 : INT_TYPE {$$ = INT_T; last_type = $$;}
 | BOOL_TYPE {$$ = BOOL_T; last_type = $$;}

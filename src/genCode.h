@@ -34,7 +34,8 @@ static char * const op_names[] = {
     [ret] =     "return"
 };
 
-struct code3add{
+struct code3add
+{
     enum Operation op;
     struct symbole *arg1, *arg2, *dst;
 };
@@ -46,12 +47,14 @@ struct genCode
     int capacity;
 }genCode;
 
-struct addr {
+struct addr 
+{
     size_t val;
     struct addr* next;
 };
 
-struct list_addr {
+struct list_addr 
+{
     struct addr* head;
     struct addr* tail;
 };

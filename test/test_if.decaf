@@ -3,14 +3,17 @@ class Program {
         int i;
         i=0;
         if (i>5){
-            if (5<4){
-                int j;
-                j=i;
+            if (69!=96){
+                break;
+                i=69;
             }
-            if (i>10){
-                i=8;
+            else {
+                i=96;
             }
             i=-1;
+        }
+        else {
+            i=1;
         }
         return;
     }

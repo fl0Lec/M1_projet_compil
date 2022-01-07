@@ -98,7 +98,7 @@ struct list_addr* concat(struct list_addr* l1, struct list_addr* l2)
 
 void complete(struct list_addr* l, int addr)
 {
-    struct addr* next, *e=l->head;
+    struct addr* next, *e=(l?l->head:NULL);
     while (e){
         genCode.tab[e->val].dst=addST_constInt(addr, ADDR);
         next=e->next;
