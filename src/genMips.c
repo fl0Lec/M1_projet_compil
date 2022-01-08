@@ -109,37 +109,105 @@ void genMod(struct code3add instr, FILE* out)
 
 void genEq(struct code3add instr, FILE* out)
 {
-    fprintf(out, "beq %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "beq $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "beq $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genNoteq(struct code3add instr, FILE* out)
 {
-    fprintf(out, "bne %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "bne $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "bne $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genInf(struct code3add instr, FILE* out)
 {
-    fprintf(out, "blt %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "blt $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "blt $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genInfeq(struct code3add instr, FILE* out)
 {
-    fprintf(out, "ble %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "ble $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "ble $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genSup(struct code3add instr, FILE* out)
 {
-    fprintf(out, "bgt %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "bgt $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "bgt $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genSupeq(struct code3add instr, FILE* out)
 {
-    fprintf(out, "bge %s %s %s\n", instr.arg1->u.id, instr.arg2->u.id, instr.dst->u.id);
+    genLoadForOP(instr, out);
+    
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "bge $t0 $t1 line.%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "bge $t0 $t1 %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genGoto(struct code3add instr, FILE* out)
 {
-    fprintf(out, "j %s\n", instr.dst->u.id);
+    switch (instr.dst->kind)
+    {
+    case CST_INT:
+        fprintf(out, "j line:%d\n", instr.dst->u.val);
+        break;
+    default:
+        fprintf(out, "j %s\n", instr.dst->u.id);
+        break;
+    }
 }
 
 void genLabel(struct code3add instr, FILE* out)
