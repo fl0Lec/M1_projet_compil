@@ -9,5 +9,5 @@ filename=${filename%%.*}
 echo "/================================================/"
 echo "compilation de ${filename}"
 echo "/================================================/"
-./decaf $file -o out/$filename.asm -tos || break; 
+./decaf $file -o out/$filename.asm -tos; 
 done

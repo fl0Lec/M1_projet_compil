@@ -1,0 +1,10 @@
+// for
+class Program {
+    void main ()
+    {
+        int i;
+        for i = 0, 1 {
+        
+        }
+    }
+}

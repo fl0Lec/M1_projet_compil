@@ -42,6 +42,7 @@ void resumeSYmbole(struct symbole* s)
         break;
     case CST_STR:
         printf("str:%s",s->u.str);
+        break;
     default:
         printf("%s", s->u.id);
         break;

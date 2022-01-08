@@ -1,0 +1,9 @@
+// break
+class Program {
+    void main ()
+    {
+        for i = 0, 1 {
+            break;
+        }
+    }
+}

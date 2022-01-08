@@ -194,6 +194,11 @@ void genIOFunctions(FILE* out)
     fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  jr $ra\n");
 }
 
+void genLineLabel(int i, FILE* out)
+{
+    fprintf(out, "\nline.%d:\n", i);
+}
+
 // --------------------------------------
 void genMips(FILE* out)
 {
@@ -217,6 +222,7 @@ void genMips(FILE* out)
     fprintf(out, "\n\n");
     while(i < genCode.size)
     {
+        fprintf(out, "\nline.%d:", i);
         instr = genCode.tab[i++];
         switch (instr.op) {
             case load: 
