@@ -77,7 +77,8 @@ void empilerST(void)
 //TODO peut être ne pas liberer la memoire mais garder la table plus tard pour la generation de code ?
 void depilerST(void)
 {
-    symTab->prev->maxloc=MAX (MAX(symTab->prev->maxloc, symTab->lastloc), symTab->maxloc);
+    if (symTab->prev != NULL)
+        symTab->prev->maxloc=MAX (MAX(symTab->prev->maxloc, symTab->lastloc), symTab->maxloc);
     symTab=symTab->prev;
 }
 

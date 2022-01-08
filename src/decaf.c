@@ -77,6 +77,7 @@ int main(int argc, char** argv)
     printf("\n");
     afficheGenCode();
     genMips(yyout);
+    
     depilerST();
     
     fclose(yyin);

@@ -1,5 +1,7 @@
 #include "genMips.h"
 
+int currentParam = 0; // le nombre de paramètres déjà empilés avant call
+
 // --------------------------------------
 // generation de code mips par instruction
 // --------------------------------------
@@ -17,14 +19,18 @@ void genLoadimm(struct code3add instr, FILE* out)   // TODO gerer si > 16 bits
 }
 
 // load les arguments pour une opération basique (add, sub...)
-void genLoadForOP(struct code3add instr, FILE* out) {
+void genLoadForOP(struct code3add instr, FILE* out)
+{
     switch (instr.arg1->kind)
     {
     case CST_INT:
         fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     default:
-        fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+        else
+            fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
     }
 
@@ -34,10 +40,21 @@ void genLoadForOP(struct code3add instr, FILE* out) {
         fprintf(out, "li $t1 %d\n", instr.arg2->u.val);
     break;
     default:
-        fprintf(out, "lw $t1 %d($sp)\n", instr.arg2->location);
+        if (instr.arg2->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg2->u.id);
+        else
+            fprintf(out, "lw $t1 %d($sp)\n", instr.arg2->location);
     break;
     }
 }
+void genStoreForOp(struct code3add instr, FILE* out)
+{
+    if (instr.dst->table->prev == NULL)
+        fprintf(out, "sw $t0 %s\n", instr.dst->u.id);
+    else
+        fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+}
+
 void genStore(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# store\n");
@@ -61,7 +78,8 @@ void genAdd(struct code3add instr, FILE* out)
     genLoadForOP(instr, out);
 
     fprintf(out, "add $t0 $t0 $t1\n");
-    fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+
+    genStoreForOp(instr, out);
 }
 
 void genSub(struct code3add instr, FILE* out)
@@ -71,7 +89,8 @@ void genSub(struct code3add instr, FILE* out)
     genLoadForOP(instr, out);
 
     fprintf(out, "sub $t0 $t0 $t1\n");
-    fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+
+    genStoreForOp(instr, out);
 }
 
 void genMul(struct code3add instr, FILE* out)
@@ -82,7 +101,8 @@ void genMul(struct code3add instr, FILE* out)
 
     fprintf(out, "mult $t0 $t1\n");
     fprintf(out, "mflo $t0\n");
-    fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+
+    genStoreForOp(instr, out);
 }
 
 void genDivi(struct code3add instr, FILE* out)
@@ -93,7 +113,8 @@ void genDivi(struct code3add instr, FILE* out)
 
     fprintf(out, "div $t0 $t1\n");
     fprintf(out, "mflo $t0\n");
-    fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+    
+    genStoreForOp(instr, out);
 }
 
 void genMod(struct code3add instr, FILE* out)
@@ -104,11 +125,13 @@ void genMod(struct code3add instr, FILE* out)
 
     fprintf(out, "div $t0 $t1\n");
     fprintf(out, "mfhi $t0\n");
-    fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
+    
+    genStoreForOp(instr, out);
 }
 
 void genEq(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Equal\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -124,6 +147,7 @@ void genEq(struct code3add instr, FILE* out)
 
 void genNoteq(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Not equal\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -139,6 +163,7 @@ void genNoteq(struct code3add instr, FILE* out)
 
 void genInf(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Inferior\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -154,6 +179,7 @@ void genInf(struct code3add instr, FILE* out)
 
 void genInfeq(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Inferior or equal\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -169,6 +195,7 @@ void genInfeq(struct code3add instr, FILE* out)
 
 void genSup(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Superior\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -184,6 +211,7 @@ void genSup(struct code3add instr, FILE* out)
 
 void genSupeq(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# Superior or equal\n");
     genLoadForOP(instr, out);
     
     switch (instr.dst->kind)
@@ -199,6 +227,7 @@ void genSupeq(struct code3add instr, FILE* out)
 
 void genGoto(struct code3add instr, FILE* out)
 {
+    fprintf(out, "\n# goto\n");
     switch (instr.dst->kind)
     {
     case CST_INT:
@@ -220,13 +249,20 @@ void genLabel(struct code3add instr, FILE* out)
 void genReturn(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# return\n");
-    fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location); // return value in v0
+    if (instr.dst->table->prev == NULL)
+        fprintf(out, "lw $t0 %s\n", instr.dst->u.id);
+    else
+        fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location); // return value in v0
     fprintf(out, "lw $ra, 0($sp)\n");    // load return pointer
     fprintf(out, "jr $ra\n\n");
 }
 
 void genParam(struct code3add instr, FILE* out)
 {
+    if (currentParam == 0) {
+
+    }
+
     fprintf(out, "\n# param\n");
     fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter TODO buggg!!!!!
     switch (instr.arg1->kind)
@@ -235,14 +271,21 @@ void genParam(struct code3add instr, FILE* out)
         fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     default:
-        fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+        else
+            fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
     }
-    fprintf(out, "sw $t0, 0($sp)\n");
+    fprintf(out, "sw $t0, -%d($sp)\n", currentParam);
+
+
+    currentParam ++;
 }
 
 void genCall(struct code3add instr, FILE* out)
 {
+    currentParam = 0;
     fprintf(out, "\n# call\n");
     fprintf(out, "jal %s\n", instr.arg1->u.id);
     fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->table->lastloc+4);
@@ -282,7 +325,7 @@ void genMips(FILE* out)
         if (s.kind==IDENT)
             fprintf(out, "%s:\t.word 0\n",s.u.id);
     }
-    
+
     fprintf(out, "\n.text\n.globl main\nj main\n\n");
     
     genIOFunctions(out);
