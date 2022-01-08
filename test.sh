@@ -6,5 +6,8 @@ mkdir out
 for file in test/unitaire/*; do 
 filename=$(basename -- "$file")
 filename=${filename%%.*}
-./decaf $file -o out/$filename.asm || break; 
+echo "/================================================/"
+echo "compilation de ${filename}"
+echo "/================================================/"
+./decaf $file -o out/$filename.asm -tos; 
 done

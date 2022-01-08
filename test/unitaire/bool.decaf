@@ -1,0 +1,8 @@
+// bool
+class Program {
+    void main() {
+        boolean a;
+        a = true;
+        a = false;
+    }
+}

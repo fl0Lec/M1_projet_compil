@@ -42,7 +42,6 @@ int main(int argc, char** argv)
                 fprintf(stderr, "no output file\n");
                 usage();
             }
-            printf("Ecriture du code dans les fichier %s\n", argv[i]);
             yyout=fopen(argv[i], "w");
         }
         else
@@ -68,11 +67,11 @@ int main(int argc, char** argv)
     if (r != 0)
         return 1;
 
-    //genMips(yyout);
     if (afficher_table)
         afficheAllST();
     printf("\n");
     afficheGenCode();
+    genMips(yyout);
     depilerST();
     
     fclose(yyin);
