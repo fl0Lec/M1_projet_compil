@@ -7,7 +7,8 @@ for file in test/unitaire/*; do
 filename=$(basename -- "$file")
 filename=${filename%%.*}
 echo "/================================================/"
-echo "compilation de ${filename}"
+echo "compilation et execution de ${filename}"
 echo "/================================================/"
-./decaf $file -o out/$filename.asm -tos; 
+./decaf $file -o out/$filename.asm -tos;
+spim -quiet -file out/$filename.asm > out/$filename.out;
 done

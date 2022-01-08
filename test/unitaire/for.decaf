@@ -3,8 +3,8 @@ class Program {
     void main ()
     {
         int i;
-        for i = 0, 1 {
-        
+        for i = 0, 5 {
+            WriteInt(i);
         }
     }
 }

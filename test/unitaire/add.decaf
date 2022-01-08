@@ -3,5 +3,6 @@ class Program {
     void main() {
         int a;
         a = 4+2;
+        WriteInt(a);
     }
 }

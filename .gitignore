@@ -5,6 +5,7 @@ lex.yy.*
 *.o
 
 # output test files
+*.out
 *.mips
 *.asm
 *.s

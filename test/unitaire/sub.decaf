@@ -4,5 +4,6 @@ class Program {
     {
         int a;
         a = 4-2;
+        WriteInt(a);
     }
 }

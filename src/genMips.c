@@ -234,7 +234,7 @@ void genGoto(struct code3add instr, FILE* out)
     switch (instr.dst->kind)
     {
     case CST_INT:
-        fprintf(out, "j line:%d\n", instr.dst->u.val);
+        fprintf(out, "j line.%d\n", instr.dst->u.val);
         break;
     default:
         fprintf(out, "j %s\n", instr.dst->u.id);
@@ -319,11 +319,6 @@ void genIOFunctions(FILE* out)
     fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
     //read_int : read int vers $v0
     fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
-}
-
-void genLineLabel(int i, FILE* out)
-{
-    fprintf(out, "\nline.%d:\n", i);
 }
 
 // --------------------------------------
@@ -414,6 +409,7 @@ void genMips(FILE* out)
             break;
         }
     }
+    fprintf(out, "\nline.%d:", genCode.current);
     fprintf(out, "\n# Program exit\nli $v0 10\nsyscall\n");
 }
 
