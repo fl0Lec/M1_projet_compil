@@ -25,6 +25,7 @@ void error(char* msg)
 struct comb 
 {
     struct list_addr* la;
+    struct symbole* s;
     int quad;
 };
 
@@ -132,6 +133,7 @@ struct comb
 
 %type <comb> else_bloc
 %type <comb> genGoto
+%type <comb> assign_for
 
 %type <list_addr> block statement list_statement
 
@@ -149,13 +151,13 @@ check_program : %empty {
 declaration : 
 type ID add_id_imm SEMICOLON declaration 
 | type ID add_id_imm COMA liste_id SEMICOLON declaration 
-| VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C block {
+| VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST();
     $5->ret=VOID_T; 
     struct symbole*s=addST_fun($2, $5); 
     completeLabel($4, s);}
-| type ID PAR_O empile_fun method_decl_param PAR_C block {
+| type ID PAR_O empile_fun method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST(); 
     $5->ret=$1; 
@@ -188,14 +190,14 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : VOID_TYPE ID empile_fun PAR_O method_decl_param PAR_C block {
+method_decl : VOID_TYPE ID empile_fun PAR_O method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST(); 
     $5->ret=VOID_T; 
     struct symbole* s=addST_fun($2, $5); 
     completeLabel($3, s);
     }
-| type ID empile_fun PAR_O method_decl_param PAR_C block  {
+| type ID empile_fun PAR_O method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST();
     $5->ret=$1;
@@ -223,7 +225,7 @@ method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->cap
 }
 ;
 
-block : ACO_O empile list_field_decl list_statement  depile ACO_C {$$=$4;}
+block : ACO_O list_field_decl list_statement  ACO_C {$$=$3;}
 ;
 
 empile : %empty {empilerST();}
@@ -271,38 +273,51 @@ location assign_op expr SEMICOLON {
     }
 }
 | method_call SEMICOLON {gencode(call, $1, NULL, NULL);}
-| IF PAR_O expr PAR_C next_ligne block else_bloc {
-    $$=$6;
-    afficheLA($3->true);
-    afficheLA($3->false);
+| IF PAR_O expr PAR_C next_ligne empile block depile else_bloc { //$6 -> $7 $7->$9
+    $$=$7;
     complete($3->true, $5);
     //printf("%d\n", $7);
-    if ($7){
-        complete($3->false, $7->quad);
-        complete($7->la, genCode.size);
+    if ($9){
+        complete($3->false, $9->quad);
+        complete($9->la, genCode.size);
 
     } else {
         complete($3->false, genCode.size);
     } 
 
 }
-| FOR ID ASSIGN expr COMA expr block {$$=NULL;}
+| FOR assign_for empile block { gencode(add, addST_constInt(1, INT_T), 0, $2->s); gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T)); 
+                                complete($2->la, genCode.size); depilerST(); complete($4, genCode.size);}
 | RETURN SEMICOLON      {$$=NULL;gencode(ret, NULL, NULL, NULL);}
 | RETURN expr SEMICOLON {$$=NULL;gencode(ret, NULL, NULL, $2);}
 | BREAK SEMICOLON       {$$=creerlist(genCode.size); gencode(goto_op, 0,0,0);}
 | CONTINUE SEMICOLON    {$$=NULL;}
-| block
+| empile block depile   {$$=$2;}
 ;
 
 else_bloc : %empty {$$=0;}
-| ELSE genGoto next_ligne block {
+| ELSE genGoto next_ligne empile block depile {
     $$=$2;
-    $$->la=concat($$->la, $4);
+    $$->la=concat($$->la, $5);
     $$->quad=genCode.size;
     }
 ;
 
 genGoto : %empty {$$=malloc(sizeof(struct comb)); $$->la=creerlist(genCode.size); gencode(goto_op, 0, 0, 0);}
+;
+
+assign_for : ID ASSIGN expr COMA expr {
+    $$=malloc(sizeof(struct comb));
+    empilerST(); 
+    struct symbole* s=addST_id($1, INT_T);
+    $$->s=s;
+    gencode(store, $3, 0, s);
+    struct symbole *t=newtemp();
+    gencode(store, $5, 0, t);
+    $$->quad=genCode.size;
+    $$->la=creerlist(genCode.size);
+    gencode(noteq, s, t, 0);
+    }
 ;
 type 
 : INT_TYPE {$$ = INT_T; last_type = $$;}
