@@ -244,15 +244,12 @@ location assign_op expr SEMICOLON {
         error("location NULL\n");
     if (!$3)
         error("expr NULL\n");
-    if ($1->type.type==BOOL_T && $3->kind!=EXPR_B)
-        error("assignement entre variable bool et expression bool");
-    else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type){
-        afficheSymb($1);
-        afficheSymb($3);
+    if ($1->type.type==BOOL_T && $3->kind!=EXPR_B && ($3->kind!=CST_INT || ($3->kind==CST_INT && $3->type.type!=BOOL_T)))
+        error("assignement entre variable bool et expression bool necessaire");
+    else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type)
         error("assignement entre variable de different type");
-    }
     
-    if ($1->type.type==BOOL_T){
+    if ($1->type.type==BOOL_T && $3->kind!=CST_INT){
         complete($3->true, genCode.size);
         complete($3->false, genCode.size+1);
         gencode(store, addST_constInt(1, INT_T), NULL, $1);
@@ -396,7 +393,7 @@ expr
             $$=t;
             break;
         case and:
-            if (($1->kind==IDENT) && ($1->type.type=BOOL_T)){
+            if (($1->kind!=FUN) && ($1->type.type=BOOL_T)){
                 struct symbole* s=addST_exprbool();
                 s->true=creerlist(genCode.size);
                 s->false=creerlist(genCode.size+1);
@@ -404,7 +401,7 @@ expr
                 gencode(goto_op, 0, 0, 0);
                 $1=s;
             }
-            if (($4->kind==IDENT) && ($4->type.type=BOOL_T)){
+            if (($4->kind!=FUN) && ($4->type.type==BOOL_T)){
                 struct symbole* s=addST_exprbool();
                 s->true=creerlist(genCode.size);
                 s->false=creerlist(genCode.size+1);
@@ -412,11 +409,15 @@ expr
                 gencode(goto_op, 0, 0, 0);
                 $4=s;
             }
-            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B)
+            if (!$1 || $1->kind!=EXPR_B || !$4 || $4->kind!=EXPR_B){
+                afficheSymb($1);
+                afficheSymb($4);
                 error("erreur de type doit etre de type expression bool ou boolean");
+            }
             complete($1->true, $3);
             $$=$4;
             $$->false=concat($4->false, $1->false);
+            break;
         case or :
             if (($1->kind==IDENT) && ($1->type.type=BOOL_T)){
                 struct symbole* s=addST_exprbool();
@@ -442,7 +443,7 @@ expr
             complete($1->false, $3);
             $$=$4;
             $$->true=concat($$->true, $1->true);
-
+            break;
         default :
             break;
     }
@@ -514,7 +515,7 @@ literal
 | char_literal { $$ = addST_constInt($1, INT_T);}
 | string_literal {$$=addST_constStr($1);}
 | bool_literal {
-    $$=NULL;
+    $$=addST_constInt($1, BOOL_T);
     }
 ;
 
@@ -524,8 +525,8 @@ int_literal
 ;
 
 bool_literal
-: TRUE {$$ = $1;}
-| FALSE {$$ = $1;}
+: TRUE {$$ = 1;}
+| FALSE {$$ = 0;}
 ;
 
 char_literal

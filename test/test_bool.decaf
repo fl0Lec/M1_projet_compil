@@ -2,9 +2,9 @@ class Program {
 
     void main() {
 	    boolean b;
-        b = 1==2;
-        b = (69==96) || b;
-        //b = (1!=2) || ((5+8)==50);
+        b = true;
+        b = (69==96) || true;
+        //b = (69==96) && true;
 	}
 
 }
