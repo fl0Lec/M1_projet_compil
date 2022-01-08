@@ -77,17 +77,20 @@ struct comb
 %token SUP
 %token EQ
 %token NOT_EQ
+
+%left INF INF_EQ SUP_EQ SUP
+%left EQ NOT_EQ
 %left OR
 %left AND
 
 /* OPERATIONS et EXPRESSIONS */
 
-%left PLUS
-%left SUB
-%left MULT
-%left DIV
-%left MOD
+%left PLUS SUB
+%left MULT DIV MOD
 %nonassoc NOT
+%left SEMICOLON
+%left PAR_O %left PAR_C
+
 %token PAR_O
 %token PAR_C
 %token ACO_O
