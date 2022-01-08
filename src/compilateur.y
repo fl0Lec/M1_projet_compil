@@ -290,8 +290,13 @@ location assign_op expr SEMICOLON {
     } 
 
 }
-| FOR assign_for empile block { gencode(add, addST_constInt(1, INT_T), 0, $2->s); gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T)); 
-                                complete($2->la, genCode.size); depilerST(); complete($4, genCode.size);}
+| FOR assign_for empile block {
+    gencode(add, addST_constInt(1, INT_T), 0, $2->s);
+    gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T));
+    complete($2->la, genCode.size);
+    depilerST();
+    complete($4, genCode.size); // TODO SEGFAULT ($4 = NULL?)
+}
 | RETURN SEMICOLON      {$$=NULL;gencode(ret, NULL, NULL, NULL);}
 | RETURN expr SEMICOLON {$$=NULL;gencode(ret, NULL, NULL, $2);}
 | BREAK SEMICOLON       {$$=creerlist(genCode.size); gencode(goto_op, 0,0,0);}

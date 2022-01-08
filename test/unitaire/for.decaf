@@ -4,7 +4,7 @@ class Program {
     {
         int i;
         for i = 0, 5 {
-            WriteInt(i);
+
         }
     }
 }

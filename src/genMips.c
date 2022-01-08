@@ -346,6 +346,7 @@ void genMips(FILE* out)
     {
         fprintf(out, "\nline.%d:", genCode.current);
         instr = genCode.tab[genCode.current++];
+        //printf("line %d\n", genCode.current);
         switch (instr.op) {
             case load: 
                 genLoad(instr, out);

@@ -32,7 +32,7 @@ doc:
 	dot -Tpdf < $(doc).dot > $(doc).pdf
 
 clean:
-	rm -rf bin doc decaf src/compilateur.tab.h src/compilateur.tab.c src/lex.yy.c
+	rm -rf out bin doc decaf src/compilateur.tab.h src/compilateur.tab.c src/lex.yy.c
 
 test: test.sh decaf
 	./test.sh
