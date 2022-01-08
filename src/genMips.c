@@ -62,13 +62,16 @@ void genStore(struct code3add instr, FILE* out)
     {
     case CST_INT:
         fprintf(out, "li $t0, %d\n", instr.arg1->u.val);
-        fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
-        break;
+    break;
     default:
-        fprintf(out, "lw $t0, %d($sp)\n", instr.arg1->location);
-        fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
-        break;
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+        else
+            fprintf(out, "lw $t0, %d($sp)\n", instr.arg1->location);
+    break;
     }
+    
+    genStoreForOp(instr, out);
 }
 
 void genAdd(struct code3add instr, FILE* out)
@@ -241,8 +244,8 @@ void genGoto(struct code3add instr, FILE* out)
 
 void genLabel(struct code3add instr, FILE* out)
 {
-    fprintf(out, "\n%s:\n", instr.dst->u.id);
-    fprintf(out, "addiu $sp, $sp, -%d\n", instr.dst->table->lastloc);
+    fprintf(out, "\n# label\n");
+    fprintf(out, "%s:\n", instr.dst->u.id);
     fprintf(out, "addiu $sp, $sp, -4\nsw $ra, 0($sp)\n"); // save return pointer
 }
 
@@ -254,17 +257,13 @@ void genReturn(struct code3add instr, FILE* out)
     else
         fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location); // return value in v0
     fprintf(out, "lw $ra, 0($sp)\n");    // load return pointer
+    fprintf(out, "addiu $sp, $sp, 4\n");
     fprintf(out, "jr $ra\n\n");
 }
 
 void genParam(struct code3add instr, FILE* out)
 {
-    if (currentParam == 0) {
-
-    }
-
     fprintf(out, "\n# param\n");
-    fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter TODO buggg!!!!!
     switch (instr.arg1->kind)
     {
     case CST_INT:
@@ -277,9 +276,15 @@ void genParam(struct code3add instr, FILE* out)
             fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
     }
-    fprintf(out, "sw $t0, -%d($sp)\n", currentParam);
 
+    // alignement dans la pile $sp
+    int i;
+    for (i=genCode.current; genCode.tab[i].op != call; i++); // il y a toujours un call après des param
 
+    if(genCode.tab[i].arg1->type.desc->context != NULL)
+        fprintf(out, "sw $t0, -%d($sp)\n", genCode.tab[i].arg1->type.desc->context->maxloc-currentParam*4);
+    else // fonctions prédéfinies
+        fprintf(out, "sw $t0, -4($sp)\n");
     currentParam ++;
 }
 
@@ -287,8 +292,19 @@ void genCall(struct code3add instr, FILE* out)
 {
     currentParam = 0;
     fprintf(out, "\n# call\n");
+
+    if(instr.arg1->type.desc->context != NULL)
+        fprintf(out, "subu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);
+    else // fonctions prédéfinies
+        fprintf(out, "sw $t0, -4($sp)\n");
+
     fprintf(out, "jal %s\n", instr.arg1->u.id);
-    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->table->lastloc+4);
+
+    if(instr.arg1->type.desc->context != NULL)
+    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);
+    else // fonctions prédéfinies
+        fprintf(out, "sw $t0, -4($sp)\n");
+
     if (instr.dst != NULL) {
         fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location);
     }
@@ -298,11 +314,11 @@ void genCall(struct code3add instr, FILE* out)
 void genIOFunctions(FILE* out)
 {
     // print_string : print string en $a0
-    fprintf(out, "\nWriteString:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 4\n  syscall\n  print_string.exit:\n    lw $ra 0($sp)\n   jr $ra\n");
+    fprintf(out, "\nWriteString:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 4\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
     // print_int : print int en $a0
-    fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  print_int.exit:\n    lw $ra 0($sp)\n    jr $ra\n");
+    fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
     //read_int : read int vers $v0
-    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  jr $ra\n");
+    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
 }
 
 void genLineLabel(int i, FILE* out)
@@ -313,7 +329,7 @@ void genLineLabel(int i, FILE* out)
 // --------------------------------------
 void genMips(FILE* out)
 {
-    int i = 0;
+    genCode.current = 0;
     struct code3add instr;
     struct symbole s;
 
@@ -331,10 +347,10 @@ void genMips(FILE* out)
     genIOFunctions(out);
     
     fprintf(out, "\n\n");
-    while(i < genCode.size)
+    while(genCode.current < genCode.size)
     {
-        fprintf(out, "\nline.%d:", i);
-        instr = genCode.tab[i++];
+        fprintf(out, "\nline.%d:", genCode.current);
+        instr = genCode.tab[genCode.current++];
         switch (instr.op) {
             case load: 
                 genLoad(instr, out);

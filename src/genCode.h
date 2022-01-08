@@ -45,6 +45,7 @@ struct genCode
     struct code3add* tab;
     int size;
     int capacity;
+    int current;    // used to iterate
 }genCode;
 
 struct addr 
