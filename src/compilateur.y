@@ -280,9 +280,7 @@ location assign_op expr SEMICOLON {
 | IF PAR_O expr PAR_C next_ligne empile block depile else_bloc { //$6 -> $7 $7->$9
     $$=$7;
     complete($3->true, $5);
-    //printf("%d\n", $7);
     if ($9){
-        printf("$9->quad %d\n", $9->quad);
         complete($3->false, $9->quad);
         completeFirst($9->la, genCode.size);
         $$=concat($$, $9->la);

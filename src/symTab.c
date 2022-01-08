@@ -2,6 +2,7 @@
 #include "genCode.h"
 
 #define TAILLE_INIT 64
+#define MAX(a, b) (a>b?a:b)
 //sur quelle valeur un type doit être aligné en mémoire
 size_t allignement(enum type t){
     switch (t)
@@ -58,6 +59,7 @@ void empilerST(void)
     s->symb=malloc(sizeof(struct symbole)*TAILLE_INIT);
     s->nbTemp=0;
     s->lastloc=(symTab==NULL||symTab->prev==NULL?0:symTab->lastloc);
+    s->maxloc=(symTab==NULL||symTab->prev==NULL?0:symTab->maxloc);
     s->size_fils = 0;
     s-> capacity_fils = TAILLE_INIT;
     s->fils=malloc(sizeof(struct symTab *)*TAILLE_INIT);
@@ -75,6 +77,7 @@ void empilerST(void)
 //TODO peut être ne pas liberer la memoire mais garder la table plus tard pour la generation de code ?
 void depilerST(void)
 {
+    symTab->prev->maxloc=MAX (MAX(symTab->prev->maxloc, symTab->lastloc), symTab->maxloc);
     symTab=symTab->prev;
 }
 
@@ -285,7 +288,7 @@ void afficherST(void)
 
 
 void affichRecST(struct symTab* s, int lvl){
-    printf("other symbtab :\n");
+    printf("%s : lastlocatio=%d maxlocation=%d\n", (lvl?"symtab suivant":"symtab global"), s->lastloc, s->maxloc);
     for (size_t i=0; i<s->size; i++){
         for (int j=0; j<lvl; j++) printf("\t");
         afficheSymb(&(s->symb[i]));

@@ -44,6 +44,7 @@ struct symTab {
     size_t capacity;        //taille en mémoire
     size_t nbTemp;          //nombre de temporaire deja present dans symTab
     int lastloc;            //last location in memorie
+    int maxloc;             //maxlocation dans fonctions
     struct symbole* symb;   //tableau des symboles
 };
 
