@@ -36,15 +36,30 @@ CHAR [[:alpha:][:digit:]#_]
     return HEXA;
 } //si ca ne marche pas, modifier les argument de strol
 
-\'{CHAR}\' {yylval.val = (int) yytext[1]; return CHAR;}
 \"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {
     yylval.mot = yytext;
     return STRING;
 }
-\'\\(\"|[t]|[n]|\\|\')\' {
-    char tmp [5];
-    snprintf(tmp, 5, "%s", yytext);
-    yylval.val = (int) tmp[1];
+
+\'{CHAR}\' {yylval.val = (int) yytext[1]; return CHAR;}
+\'\\\"\' {
+    yylval.val = 34;
+    return CHAR;
+}
+\'\\\'\' {
+    yylval.val = 39;
+    return CHAR;
+}
+\'\\\\\' {
+    yylval.val = 92;
+    return CHAR;
+}
+\'\\[t]\' {
+    yylval.val = 9;
+    return CHAR;
+}
+\'\\[n]\' {
+    yylval.val = 10;
     return CHAR;
 }
 

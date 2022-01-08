@@ -1,7 +1,7 @@
 // char
 class Program {
     void main() {
-        char a;
+        int a;
         a = 'c';
     }
 }

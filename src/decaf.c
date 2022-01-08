@@ -42,7 +42,6 @@ int main(int argc, char** argv)
                 fprintf(stderr, "no output file\n");
                 usage();
             }
-            printf("Ecriture du code dans les fichier %s\n", argv[i]);
             yyout=fopen(argv[i], "w");
         }
         else

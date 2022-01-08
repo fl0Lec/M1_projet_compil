@@ -160,7 +160,7 @@ void genReturn(struct code3add instr, FILE* out)
 void genParam(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# param\n");
-    fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter
+    fprintf(out, "addiu $sp, $sp, -4\n"); // save parameter TODO buggg!!!!!
     switch (instr.arg1->kind)
     {
     case CST_INT:
