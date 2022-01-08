@@ -80,8 +80,9 @@ void addlist(struct list_addr*, size_t);
 //concat deux liste renvoye le pointeur sur la première
 struct list_addr* concat(struct list_addr*, struct list_addr*);
 
-//complete les destination dans liste et libère la mémoire
+//complete les destination dans liste et libère la mémoire commpleteFirst ne complete que le premier et e retire de la liste
 void complete(struct list_addr*, int);
+void completeFirst(struct list_addr* l, int addr);
 
 //compele la fonction quand label
 void completeLabel(struct list_addr*, struct symbole*);

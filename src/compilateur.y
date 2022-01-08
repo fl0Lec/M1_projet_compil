@@ -256,8 +256,9 @@ location assign_op expr SEMICOLON {
     
     if ($1->type.type==BOOL_T && $3->kind!=CST_INT){
         complete($3->true, genCode.size);
-        complete($3->false, genCode.size+1);
+        complete($3->false, genCode.size+2);
         gencode(store, addST_constInt(1, INT_T), NULL, $1);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
         gencode(store, addST_constInt(0, INT_T), NULL, $1);
     }
     else {
@@ -281,8 +282,10 @@ location assign_op expr SEMICOLON {
     complete($3->true, $5);
     //printf("%d\n", $7);
     if ($9){
+        printf("$9->quad %d\n", $9->quad);
         complete($3->false, $9->quad);
-        complete($9->la, genCode.size);
+        completeFirst($9->la, genCode.size);
+        $$=concat($$, $9->la);
 
     } else {
         complete($3->false, genCode.size);
@@ -302,7 +305,7 @@ else_bloc : %empty {$$=0;}
 | ELSE genGoto next_ligne empile block depile {
     $$=$2;
     $$->la=concat($$->la, $5);
-    $$->quad=genCode.size;
+    $$->quad=$3;
     }
 ;
 
@@ -368,7 +371,17 @@ method_call_args
 ;
 
 expr
-: location  {$$=$1;}
+: location  {
+    if ($1->type.type==BOOL_T){
+        $$=addST_exprbool();
+        $$->true=creerlist(genCode.size);
+        $$->false=creerlist(genCode.size+1);
+        gencode(eq, $1, addST_constInt(1,INT_T), 0);
+        gencode(goto_op, 0,0,0);
+    }
+    else 
+        $$=$1;
+        }
 | method_call {
     if ($1->type.desc->ret==VOID_T)
         error("fonction sans retour dans expression");
@@ -376,7 +389,17 @@ expr
     $$->type.type=$1->type.desc->ret;
     gencode(call, $1, NULL, $$);
 }
-| literal   {$$=$1;}
+| literal   {
+    if ($1->type.type==BOOL_T){
+        $$=addST_exprbool();
+        $$->true=creerlist(genCode.size);
+        $$->false=creerlist(genCode.size+1);
+        gencode(eq, $1, addST_constInt(1,INT_T), 0);
+        gencode(goto_op, 0,0,0);
+    }
+    else 
+        $$=$1;
+        }
 | expr bin_op next_ligne expr {//shif reduce ici
     struct symbole* t;
     //switch sur les differentes operations binaires

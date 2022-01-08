@@ -107,6 +107,15 @@ void complete(struct list_addr* l, int addr)
     }
 }
 
+void completeFirst(struct list_addr* l, int addr)
+{
+    struct addr *e=(l?l->head:NULL);
+    genCode.tab[e->val].dst=addST_constInt(addr, ADDR);
+    l->head=e->next;
+    free(e);
+    return;
+}
+
 void completeLabel(struct list_addr* l, struct symbole* s)
 {
     struct addr* next, *e=l->head;

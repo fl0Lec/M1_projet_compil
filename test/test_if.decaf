@@ -1,19 +1,18 @@
 class Program {
     void main() {
         int i;
-        i=0;
-        if (i>5){
-            if (69!=96){
-                break;
-                i=69;
+        boolean b;
+        b= false;
+        i=20;
+        if (b && (i>5)){
+            i=6;
+            if (i==2){
+                int j;
+                j=5;
             }
             else {
-                i=96;
+                i+=2;
             }
-            i=-1;
-        }
-        else {
-            i=1;
         }
         return;
     }
