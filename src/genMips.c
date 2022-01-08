@@ -296,17 +296,17 @@ void genCall(struct code3add instr, FILE* out)
     if(instr.arg1->type.desc->context != NULL)
         fprintf(out, "subu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);
     else // fonctions prédéfinies
-        fprintf(out, "sw $t0, -4($sp)\n");
+        fprintf(out, "addiu $sp, $sp, -4\n");
 
     fprintf(out, "jal %s\n", instr.arg1->u.id);
 
     if(instr.arg1->type.desc->context != NULL)
-    fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);
+        fprintf(out, "addiu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);
     else // fonctions prédéfinies
-        fprintf(out, "sw $t0, -4($sp)\n");
+        fprintf(out, "addiu $sp, $sp, 4\n");
 
     if (instr.dst != NULL) {
-        fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location);
+        fprintf(out, "sw $v0, %d($sp)\n", instr.dst->location);
     }
 }
 
