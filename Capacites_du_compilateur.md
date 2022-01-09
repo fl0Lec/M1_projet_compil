@@ -42,6 +42,7 @@ Les opérateurs arithmétiques sont :
 
 Les opérations load et loadimm n'ont finalement pas trouvé leurs places dans la génération de code. 
 En effet, la traduction du code en mips s'occupe de load les arguments.
+
 Les arguments peuvent être des constantes ou des variables (globales ou locales).
 
 **load :** dst := arg1
