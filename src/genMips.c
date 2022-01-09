@@ -308,6 +308,14 @@ void genCall(struct code3add instr, FILE* out)
     if (instr.dst != NULL) {
         fprintf(out, "sw $v0, %d($sp)\n", instr.dst->location);
     }
+    if (strcmp("ReadInt", instr.arg1->u.id) == 0) {
+        struct code3add param = genCode.tab[genCode.current-2];
+        if (param.arg1->table->prev == NULL)
+            fprintf(out, "sw $v0 %s\n", param.arg1->u.id);
+        else
+            fprintf(out, "sw $v0 %d($sp)\n", param.arg1->location);
+    }
+
 }
 
 // génère les fonctions d'entrées et sorties
@@ -318,7 +326,7 @@ void genIOFunctions(FILE* out)
     // print_int : print int en $a0
     fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
     //read_int : read int vers $v0
-    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  li $v0 5\n  syscall\n  sw $v0 4($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
+    fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 5\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
 }
 
 // --------------------------------------
