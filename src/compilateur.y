@@ -328,7 +328,7 @@ assign_for : ID ASSIGN expr COMA expr {
     gencode(store, $5, 0, t);
     $$->quad=genCode.size;
     $$->la=creerlist(genCode.size);
-    gencode(eq, s, t, 0);
+    gencode(sup, s, t, 0);
     }
 ;
 type 
