@@ -165,6 +165,7 @@ struct symbole* addST_exprbool()
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=EXPR_B;
     s->type.type=VOID_T;
+    s->table = symTab;
     return s;
 }
 
@@ -181,13 +182,19 @@ struct symbole* addST_constInt(int val, enum type type)
 
 struct symbole* addST_constStr(char* val)
 {
+    struct symTab* old = symTab;
+    for (;symTab->prev != NULL; symTab = symTab->prev);
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=CST_STR;
-    s->u.str=malloc(sizeof(char)*((strlen(val)+1)));
+    s->u.str=malloc(sizeof(char)*((strlen(val)+2)));
     strcpy(s->u.str, val);
+
+    s->u.id=malloc(30); // number of digit of a long < 25
+    sprintf(s->u.id, "str.%ld", nbStr++);
     s->type.type=STRING_T;
     s->table = symTab;
+    symTab = old;
     return s;
 }
 

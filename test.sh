@@ -2,6 +2,7 @@ mkdir out
 for file in test/unitaire/*; do 
 filename=$(basename -- "$file")
 filename=${filename%%.*}
-./decaf $file -o out/$filename.asm -tos > out/$filename.cerr;
+echo "========================= compile $filename ========================="
+./decaf $file -o out/$filename.asm -tos|| continue;
 spim -quiet -file out/$filename.asm > out/$filename.out;
 done
