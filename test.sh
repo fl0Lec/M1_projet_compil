@@ -3,6 +3,6 @@ for file in test/unitaire/*; do
 filename=$(basename -- "$file")
 filename=${filename%%.*}
 echo "========================= compile $filename ========================="
-./decaf $file -o out/$filename.asm -tos > out/$filename.cerr;
+./decaf $file -o out/$filename.asm -tos|| continue;
 spim -quiet -file out/$filename.asm > out/$filename.out;
 done

@@ -165,6 +165,7 @@ struct symbole* addST_exprbool()
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=EXPR_B;
     s->type.type=VOID_T;
+    s->table = symTab;
     return s;
 }
 
