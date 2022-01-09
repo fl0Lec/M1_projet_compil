@@ -1,0 +1,9 @@
+class Program {
+    void main(){
+        int i;
+        WriteString("rentrez ");
+        ReadInt(i);
+        //WriteString("vous avez rentrez : ");
+        WriteInt(i);
+    }
+}

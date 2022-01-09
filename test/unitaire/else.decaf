@@ -13,5 +13,6 @@ class Program {
             c = false;
             WriteInt(b);
         }
+        return;
     }
 }

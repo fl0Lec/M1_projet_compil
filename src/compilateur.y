@@ -143,7 +143,7 @@ struct comb
 
 %%
 
-program : CLASS ID check_program ACO_O declaration list_method_decl ACO_C {afficheAllST();printf("\n\n");}
+program : CLASS ID check_program ACO_O declaration list_method_decl ACO_C 
 
 check_program : %empty {
     // si il y a quelque chose à faire du nom du programme (même nom que le fichier ...)
@@ -383,7 +383,6 @@ method_call
         (s?affichefundesc(s->type.desc):0);
         error("erreur argument different");
     }
-    printf("methode call on %s\n", $1);
     $$=s;
     
 } // fonction

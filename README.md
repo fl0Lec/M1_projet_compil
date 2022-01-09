@@ -1,4 +1,4 @@
-**Authors : Antoine DUMOULIN, Antoine PIERRE, Mickaël**
+**Authors : Antoine DUMOULIN, Antoine PIERRE, Florent LECOULTRE, Mickaël**
 
 # execution
 

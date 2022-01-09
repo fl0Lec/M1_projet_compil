@@ -73,7 +73,7 @@ int main(int argc, char** argv)
         afficheAllST();
         exit(-1);
     }
-    
+
     if (afficher_table)
         afficheAllST();
     printf("\n");
