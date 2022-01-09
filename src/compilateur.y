@@ -613,7 +613,7 @@ expr
     $$->type.type=INT_T;
     if (!$2 || $2->type.type!=INT_T)
         error("erreur de type doit être int");
-    gencode(subun, $2, 0, $$);}
+    gencode(sub, addST_constInt(0, INT_T), $2, $$);}
 | NOT expr  {
     struct symbole *t;
     if ($2->kind==EXPR_B){
