@@ -82,6 +82,8 @@ struct fundesc* initfun();
 void addtypefd(struct fundesc*, enum type);
 //compare duex fundesc si les argument on le meme type 1 si ok 0 sinon
 int compfundesc(struct fundesc*, struct fundesc*);
+//affiche fundesc - pour debug
+void affichefundesc(struct fundesc*);
 
 static char * const kind_names[] = {
     [TEMPO] =   "temp",

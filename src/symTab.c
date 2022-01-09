@@ -86,23 +86,33 @@ void initST(void)
 {
     empilerST();
     struct fundesc* desc=malloc(sizeof(struct fundesc));
+    char* s;
     desc->nbArg=1;
     desc->args=malloc(sizeof(enum type)*desc->nbArg);
     desc->args[0]=INT_T;
     desc->ret=VOID_T;
-    addST_fun("WriteInt", desc);
+    s=malloc(sizeof(char)*(strlen("WriteInt")+1));
+    strcpy(s, "WriteInt");
+    addST_fun(s, desc);
     desc=malloc(sizeof(struct fundesc));
     desc->nbArg=1;
     desc->ret=VOID_T;
     desc->args=malloc(sizeof(enum type)*desc->nbArg);
     desc->args[0]=INT_T;
-    addST_fun("ReadInt", desc);
+    s=malloc(sizeof(char)*(strlen("ReadInt")+1));
+    strcpy(s, "ReadInt");
+    addST_fun(s, desc);
+
     desc=malloc(sizeof(struct fundesc));
     desc->nbArg=1;
     desc->ret=VOID_T;
     desc->args=malloc(sizeof(enum type)*desc->nbArg);
     desc->args[0]=STRING_T;
-    addST_fun("WriteString", desc);
+    //addST_fun("WriteString", desc);
+    s=malloc(sizeof(char)*(strlen("WriteString")+1));
+    strcpy(s, "WriteString");
+    addST_fun(s, desc);
+    return;
     
 }
 
@@ -126,8 +136,8 @@ struct symbole* addST_id(char *id, enum type type)
     check_idST(id);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=IDENT;
-    s->u.id=malloc(sizeof(char)*strlen(id));
-    strcpy(s->u.id, id);
+    s->u.id=malloc(sizeof(char)*(strlen(id)+1));
+    strncpy(s->u.id, id, strlen(id));
     s->type.type=type;
     symTab->lastloc+=allignement(TEMP);
     s->location=symTab->lastloc;
@@ -174,7 +184,7 @@ struct symbole* addST_constStr(char* val)
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=CST_STR;
-    s->u.str=malloc(sizeof(char)*(strlen(val)));
+    s->u.str=malloc(sizeof(char)*((strlen(val)+1)));
     strcpy(s->u.str, val);
     s->type.type=STRING_T;
     s->table = symTab;
@@ -187,8 +197,12 @@ struct symbole* addST_fun(char *id, struct fundesc* fundesc)
     check_idST(id);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=FUN;
-    s->u.id=malloc(sizeof(char)*strlen(id));
-    strcpy(s->u.id, id);
+    s->u.id=id;
+    /*
+    s->u.id=malloc(sizeof(char)*(strlen(id)));
+    strncpy(s->u.id, id, strlen(id));
+    s->u.id[strlen(id)]='\0';
+    //printf("|new fun : %s %s\n", s->u.id, id);*/
     s->type.desc=fundesc;
     s->table = symTab;
     //s->type.desc->ret=ret;
@@ -305,4 +319,12 @@ void afficheAllST(void){
         s=s->prev;
     affichRecST(s, 0);
     
+}
+
+void affichefundesc(struct fundesc* fd)
+{
+    for (int i=0; i<fd->nbArg; i++){
+        printf("%s ",type_names[fd->args[i]]);
+    }
+    printf("| ret : %s\n", type_names[fd->ret]);
 }

@@ -351,20 +351,37 @@ location
         fprintf(stderr, "no entry in table for %s\n", $1);
         exit(-1);
     }
+    if ($$->kind==FUN){
+        fprintf(stderr, "%s ",$1);
+        error("location ne peut pas être un identificateur de fonction\n");
+    }
 }
 ;
 
 method_call
 : ID PAR_O PAR_C {
     struct symbole* s=lookupST($1);
-    if (!s || s->kind!=FUN || s->type.desc->nbArg!=0)
-        error("erreur appel fonction nom ou pas d'argument");
+    if (!s){
+        fprintf(stderr, "pour %s ",$1);
+        error("identificateur de fonction non trouver");
+    }
+    if (s->type.desc->nbArg!=0){
+        fprintf(stderr, "%s ", $1);
+        error("n'as pas d'argument");
+    }
     $$=s;
 }   // procédure
 | ID PAR_O method_call_args PAR_C {
     struct symbole* s=lookupST($1);
-    if (!s || !compfundesc(s->type.desc, $3))
+    if (!s){
+        fprintf(stderr, "pour %s ",$1);
+        error("identificateur de fonction non trouver");
+    }
+    if (!compfundesc(s->type.desc, $3)){
+        affichefundesc($3);
+        (s?affichefundesc(s->type.desc):0);
         error("erreur argument different");
+    }
     $$=s;
     
 } // fonction

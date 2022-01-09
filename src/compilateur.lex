@@ -114,7 +114,8 @@ void {return VOID_TYPE;}
 
 [[:alpha:]_]([[:alpha:]0-9_])* {
     yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1));
-    strcpy(yylval.mot, yytext);
+    strncpy(yylval.mot, yytext, strlen(yytext));
+    printf("%s\n", yylval.mot);
     return ID;
 }
 
