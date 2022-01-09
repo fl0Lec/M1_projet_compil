@@ -36,7 +36,7 @@ CHAR [[:alpha:][:digit:]#_]
     return HEXA;
 } //si ca ne marche pas, modifier les argument de strol
 
-\"([[:space:]]|\\\"|\\\'|\\\\|\\[n]|\\[t]|{CHAR})*\" {
+\"(\\.|[^"\\])*\" {
     yylval.mot = yytext;
     return STRING;
 }
@@ -113,8 +113,9 @@ void {return VOID_TYPE;}
 
 
 [[:alpha:]_]([[:alpha:]0-9_])* {
-    yylval.mot = malloc(sizeof(char)*(strlen(yytext)+1));
+    yylval.mot = malloc(sizeof(char)*(strlen(yytext)));
     strncpy(yylval.mot, yytext, strlen(yytext));
+    yylval.mot[strlen(yytext)]='\0';
     return ID;
 }
 

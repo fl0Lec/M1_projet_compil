@@ -4,7 +4,20 @@ class Program {
 	    boolean b;
         b = true;
         b = (69==96) || true;
-        //b = (69==96) && true;
+        if (b){
+            WriteString("vrai1");
+        }
+        else {
+            WriteString("faux1");
+        }
+        WriteString("\n");
+        b = (69==96) && true;
+        if (b){
+            WriteString("vrai2");
+        }
+        else {
+            WriteString("faux2");
+        }
 	}
 
 }
