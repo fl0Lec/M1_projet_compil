@@ -1,6 +1,6 @@
 class Program {
     int a;
-    int t[5];
+    int t[5], tab[10];
     void main() {
         int i;
         i=t[1];

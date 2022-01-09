@@ -153,10 +153,15 @@ check_program : %empty {
 
 declaration : 
 type ID add_id_imm SEMICOLON declaration 
-| type ID add_id_imm COMA liste_id SEMICOLON declaration 
+| type ID add_id_imm COMA liste_id_init SEMICOLON declaration 
 | type ID add_tab_imm CRO_O int_literal CRO_F SEMICOLON declaration {
     if ($5<1)
         error("tableau decalration minimum 1");
+    $3->u.val=$5;
+}
+| type ID add_tab_imm CRO_O int_literal CRO_F COMA liste_id_init SEMICOLON declaration {
+    if ($5<1)
+        error("tableau declaration minimum 1");
     $3->u.val=$5;
 }
 | VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C empile block depile {
@@ -179,12 +184,28 @@ add_id_imm : %empty {addST_id(yylval.mot, last_type);}
 
 add_tab_imm : %empty {
     $$=addST_tab(yylval.mot, last_type, 5);
+    printf("tab : %s\n", yylval.mot);
 }
 empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
 
 list_field_decl : %empty {}
 | list_field_decl field_decl
+;
+
+liste_id_init : %empty 
+| ID add_id_imm 
+| ID add_id_imm COMA liste_id_init
+| ID add_tab_imm CRO_O int_literal CRO_F{
+    if ($4<1)
+        error("tableau decalration minimum 1");
+    $2->u.val=$4;   
+}
+| ID add_tab_imm CRO_O int_literal CRO_F COMA liste_id_init {
+    if ($4<1)
+        error("tableau decalration minimum 1");
+    $2->u.val=$4;   
+}
 ;
 
 liste_id: %empty {}
@@ -305,14 +326,18 @@ location assign_op expr SEMICOLON {
     } else {
         complete($3->false, genCode.size);
     } 
-
+    $$=0;
 }
 | FOR assign_for empile block {
     gencode(add, addST_constInt(1, INT_T), $2->s, $2->s);
     gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T));
+    printf("complete1\n");
     complete($2->la, genCode.size);
     depilerST();
+    printf("complete2\n");
     complete($4, genCode.size); // TODO SEGFAULT ($4 = NULL?)
+    printf("complete3\n");
+    $$=0;
 }
 | RETURN SEMICOLON      {$$=NULL;gencode(ret, NULL, NULL, NULL);}
 | RETURN expr SEMICOLON {$$=NULL;gencode(ret, NULL, NULL, $2);}
