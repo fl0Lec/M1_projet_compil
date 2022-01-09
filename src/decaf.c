@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     if (!s || s->kind!=FUN || s->type.desc->nbArg!=0 || s->type.desc->ret!=VOID_T){
         fprintf(stderr, "erreur programme doit contenir fonction main sans paramètre\n");
         afficheAllST();
-        exit(-1);
+        exit(1);
     }
 
     if (afficher_table)

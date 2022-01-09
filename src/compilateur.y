@@ -19,7 +19,7 @@ void error(char* msg)
     fprintf(stderr, "%s\n", msg);
     afficheGenCode();
     afficheAllST();
-    exit(-1);
+    exit(1);
 }
 
 struct comb 
@@ -281,6 +281,8 @@ location assign_op expr SEMICOLON {
 }
 | method_call SEMICOLON {$$=0; gencode(call, $1, NULL, NULL);}
 | IF PAR_O expr PAR_C next_ligne empile block depile else_bloc { //$6 -> $7 $7->$9
+    if ($3->kind!=EXPR_B)
+        error("expression de type incorrect dans if\n");
     $$=$7;
     complete($3->true, $5);
     if ($9){
@@ -323,6 +325,8 @@ assign_for : ID ASSIGN expr COMA expr {
     empilerST(); 
     struct symbole* s=addST_id($1, INT_T);
     $$->s=s;
+    if ($3->type.type!=INT_T)
+        error("for attend valeur entiere");
     gencode(store, $3, 0, s);
     struct symbole *t=newtemp();
     gencode(store, $5, 0, t);
@@ -350,7 +354,7 @@ location
     if (!$$){
         afficherST();
         fprintf(stderr, "no entry in table for %s\n", $1);
-        exit(-1);
+        exit(1);
     }
     if ($$->kind==FUN){
         fprintf(stderr, "%s ",$1);
@@ -389,7 +393,23 @@ method_call
 ;
 
 method_call_args
-: method_call_args COMA expr {$$=$1; addtypefd($$, $3->type.type); gencode(param, $3, NULL, NULL);}
+: method_call_args COMA expr {
+    struct symbole* t;
+    $$=$1;
+    if ($3->kind==EXPR_B){
+        t=newtemp();
+        t->type.type=BOOL_T;
+        complete($3->true, genCode.size);
+        complete($3->false, genCode.size+2);
+        gencode(store, addST_constInt(1, INT_T), NULL, t);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
+        gencode(store, addST_constInt(0, INT_T), NULL, t);
+        $3=t;
+
+    }
+    addtypefd($$, $3->type.type);
+    gencode(param, $3, NULL, NULL);
+    }
 | expr {$$=initfun(); addtypefd($$, $1->type.type); gencode(param, $1, NULL, NULL);}
 ;
 

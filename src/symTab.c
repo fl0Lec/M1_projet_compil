@@ -124,7 +124,7 @@ void check_idST(char* str){
             fprintf(stderr, "impossible identifiant : %s deja present\n", str);
             afficherST();
             afficheGenCode();
-            exit(-1);
+            exit(1);
         }
 
     }
