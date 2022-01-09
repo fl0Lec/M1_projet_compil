@@ -16,6 +16,9 @@ attention les argument peuvent aussi être des constante
 ## load 
 dst := arg1
 
+## loadTab
+dst := &arg1[arg2] :l'adresse de arg2 dans le tableau arg1 
+
 ## loadimm
 dst := val 
 
