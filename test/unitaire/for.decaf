@@ -3,6 +3,7 @@ class Program {
     void main ()
     {
         for i = 0, 5 {
+            //WriteString("\n valeur de i : ");
             WriteInt(i);
         }
     }
