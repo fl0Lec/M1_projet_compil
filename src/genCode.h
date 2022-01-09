@@ -15,6 +15,7 @@ static char * const op_names[] = {
 	[loadimm] = "loadimm",
 	[store] =   "store",
     [add] =     "add",
+    [sub] =     "sub",
     [mul] =     "mult",
     [divi] =    "divi",
     [mod] =     "mod",

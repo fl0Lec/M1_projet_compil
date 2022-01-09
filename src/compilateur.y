@@ -78,14 +78,6 @@ struct comb
 %token EQ
 %token NOT_EQ
 
-/* PRIORITE */
-%left AND
-%left OR
-%left EQ NOT_EQ
-%left SUP SUP_EQ INF INF_EQ
-%left PLUS SUB
-%left MULT DIV MOD
-%nonassoc NOT
 
 
 /* OPERATIONS et EXPRESSIONS */
@@ -105,6 +97,16 @@ struct comb
 %token CONTINUE
 %token ELSE
 
+/* PRIORITE */
+%left AND
+%left OR
+%left EQ NOT_EQ
+%left SUP SUP_EQ INF INF_EQ
+%left PLUS SUB
+%left MULT DIV MOD
+%nonassoc NOT
+%left PAR_O PAR_C COMA
+
 /* TYPES */
 %type <mot> ID
 %type <val> int_literal
@@ -118,11 +120,7 @@ struct comb
 %type <id> expr
 %type <id> literal
 
-%type <op> rel_op
-%type <op> cond_op
-%type <op> eq_op
-%type <op> arith_op
-%type <op> bin_op
+
 %type <assign_op_type> assign_op
 %type <val> next_ligne
 
@@ -443,41 +441,122 @@ expr
     else 
         $$=$1;
         }
-| expr bin_op next_ligne expr {//shif reduce ici
+| expr PLUS expr {
     struct symbole* t;
-    //switch sur les differentes operations binaires
-    switch($2){
-        //arith_op
-        case add:
-        case sub:
-        case mul:
-        case divi:
-        case mod: ;
-            t=newtemp();
-            if (!$1 || $1->type.type!=INT_T || !$4 || $4->type.type!=INT_T)
-                error("erreur de type doit être de type int");
-            t->type.type=INT_T;
-            gencode($2, $1, $4, t);
-            $$=t;
-            break;
-        //rel_op et eq_op
-        case inf:
-        case infeq:
-        case sup:
-        case supeq:
-        case eq:
-        case noteq: ;
-            t=addST_exprbool();
-            if (!$1 || $1->type.type!=INT_T || !$4 || $4->type.type!=INT_T)
-                error("erreur de type doit être de type int");
-            t->true=creerlist(genCode.size);
-            t->false=creerlist(genCode.size+1);
-            gencode($2, $1, $4, NULL);
-            gencode(goto_op, NULL, NULL, NULL);
-            $$=t;
-            break;
-        case and:
-            if (($1->kind!=FUN) && ($1->type.type=BOOL_T)){
+    t=newtemp();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->type.type=INT_T;
+    gencode(add, $1, $3, t);
+    $$=t;
+}
+| expr SUB expr {
+    struct symbole* t;
+    t=newtemp();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->type.type=INT_T;
+    gencode(sub, $1, $3, t);
+    $$=t;
+}
+| expr MULT expr {
+    struct symbole* t;
+    t=newtemp();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->type.type=INT_T;
+    gencode(mul, $1, $3, t);
+    $$=t;
+}
+| expr DIV expr {
+    struct symbole* t;
+    t=newtemp();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->type.type=INT_T;
+    gencode(divi, $1, $3, t);
+    $$=t;
+}
+| expr MOD expr {
+    struct symbole* t;
+    t=newtemp();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->type.type=INT_T;
+    gencode(mod, $1, $3, t);
+    $$=t;
+    //////////////////////////rel_op
+}
+|expr INF expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(inf, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+}
+| expr INF_EQ expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(infeq, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+}
+| expr SUP expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(sup, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+}
+| expr SUP_EQ expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(supeq, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+}
+| expr EQ expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(eq, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+}
+| expr NOT_EQ expr {
+    struct symbole* t;
+    t=addST_exprbool();
+    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
+        error("erreur de type doit être de type int");
+    t->true=creerlist(genCode.size);
+    t->false=creerlist(genCode.size+1);
+    gencode(noteq, $1, $3, NULL);
+    gencode(goto_op, NULL, NULL, NULL);
+    $$=t;
+    /////////////////and-or
+}
+
+|expr AND next_ligne expr {
+    if (($1->kind!=FUN) && ($1->type.type=BOOL_T)){
                 struct symbole* s=addST_exprbool();
                 s->true=creerlist(genCode.size);
                 s->false=creerlist(genCode.size+1);
@@ -501,8 +580,9 @@ expr
             complete($1->true, $3);
             $$=$4;
             $$->false=concat($4->false, $1->false);
-            break;
-        case or :
+
+}
+|expr OR next_ligne expr {
             if (($1->kind==IDENT) && ($1->type.type=BOOL_T)){
                 struct symbole* s=addST_exprbool();
                 s->true=creerlist(genCode.size);
@@ -527,10 +607,6 @@ expr
             complete($1->false, $3);
             $$=$4;
             $$->true=concat($$->true, $1->true);
-            break;
-        default :
-            break;
-    }
 }
 | SUB expr {
     $$=newtemp();
@@ -560,38 +636,6 @@ expr
 ;
 
 next_ligne : %empty {$$=genCode.size;}
-;
-
-bin_op
-: arith_op {$$=$1;}
-| rel_op {$$=$1;}
-| eq_op {$$=$1;}
-| cond_op { {$$=$1;}}
-;
-
-arith_op
-: PLUS {$$=add;}
-| SUB {$$=sub;}
-| MULT {$$=mul;}
-| DIV {$$=divi;}
-| MOD {$$=mod;}
-;
-
-rel_op
-: INF {$$=inf;}
-| INF_EQ {$$=infeq;}
-| SUP {$$=sup;}
-| SUP_EQ {$$=supeq;}
-;
-
-eq_op
-: EQ {$$=eq;}
-| NOT_EQ {$$=noteq;}
-;
-
-cond_op
-: OR {$$=or;}
-| AND {$$=and;}
 ;
 
 literal
