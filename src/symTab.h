@@ -21,7 +21,7 @@ struct fundesc {
 //liste chainée d'ID
 struct symbole {
     enum  {TEMPO, EXPR_B, IDENT, TAB, FUN, CST_INT, CST_STR} kind;
-    union 
+    struct 
     {
         char* id;           //identifiant (variable, tableau, ou fonction)
         char* str;          //for string literal
@@ -49,6 +49,7 @@ struct symTab {
 };
 
 struct symTab *symTab;
+size_t nbStr;           // nombre de string deja present dans symtab
 
 
 //empile une table sur la table global
