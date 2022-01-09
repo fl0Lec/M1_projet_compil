@@ -78,18 +78,17 @@ struct comb
 %token EQ
 %token NOT_EQ
 
-%left INF INF_EQ SUP_EQ SUP
-%left EQ NOT_EQ
-%left OR
+/* PRIORITE */
 %left AND
-
-/* OPERATIONS et EXPRESSIONS */
-
+%left OR
+%left EQ NOT_EQ
+%left SUP SUP_EQ INF INF_EQ
 %left PLUS SUB
 %left MULT DIV MOD
 %nonassoc NOT
-%left SEMICOLON
-%left PAR_O %left PAR_C
+
+
+/* OPERATIONS et EXPRESSIONS */
 
 %token PAR_O
 %token PAR_C
@@ -249,10 +248,13 @@ location assign_op expr SEMICOLON {
         error("location NULL\n");
     if (!$3)
         error("expr NULL\n");
-    if ($1->type.type==BOOL_T && $3->kind!=EXPR_B && ($3->kind!=CST_INT || ($3->kind==CST_INT && $3->type.type!=BOOL_T)))
+    if ($1->type.type==BOOL_T && $3->kind!=EXPR_B)
         error("assignement entre variable bool et expression bool necessaire");
     else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type)
         error("assignement entre variable de different type");
+    else if ($1->type.type==BOOL_T && $2!=NORMAL_ASSIGN){
+        error("seulement l'affectation est valide pour les boolean");
+    }
     
     if ($1->type.type==BOOL_T && $3->kind!=CST_INT){
         complete($3->true, genCode.size);
@@ -356,7 +358,7 @@ method_call
 }   // procédure
 | ID PAR_O method_call_args PAR_C {
     struct symbole* s=lookupST($1);
-    if (!compfundesc(s->type.desc, $3))
+    if (!s || !compfundesc(s->type.desc, $3))
         error("erreur argument different");
     $$=s;
     
