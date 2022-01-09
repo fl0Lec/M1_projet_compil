@@ -270,8 +270,13 @@ void genParam(struct code3add instr, FILE* out)
         fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
     default:
-        if (instr.arg1->table->prev == NULL)
-            fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
+        if (instr.arg1->table->prev == NULL){
+            if (instr.arg1->kind==CST_STR){
+                fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
+            } else {
+                fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+            }
+        }
         else
             fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
