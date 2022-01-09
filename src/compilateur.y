@@ -294,7 +294,7 @@ location assign_op expr SEMICOLON {
 
 }
 | FOR assign_for empile block {
-    gencode(add, addST_constInt(1, INT_T), 0, $2->s);
+    gencode(add, addST_constInt(1, INT_T), $2->s, $2->s);
     gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T));
     complete($2->la, genCode.size);
     depilerST();

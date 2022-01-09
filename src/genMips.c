@@ -28,7 +28,7 @@ void genLoadForOP(struct code3add instr, FILE* out)
     break;
     default:
         if (instr.arg1->table->prev == NULL)
-            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+            fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
         else
             fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
@@ -41,7 +41,7 @@ void genLoadForOP(struct code3add instr, FILE* out)
     break;
     default:
         if (instr.arg2->table->prev == NULL)
-            fprintf(out, "lw $t0 %s\n", instr.arg2->u.id);
+            fprintf(out, "la $t1 %s\n", instr.arg2->u.id);
         else
             fprintf(out, "lw $t1 %d($sp)\n", instr.arg2->location);
     break;
@@ -65,7 +65,7 @@ void genStore(struct code3add instr, FILE* out)
     break;
     default:
         if (instr.arg1->table->prev == NULL)
-            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+            fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
         else
             fprintf(out, "lw $t0, %d($sp)\n", instr.arg1->location);
     break;
@@ -253,7 +253,7 @@ void genReturn(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# return\n");
     if (instr.dst->table->prev == NULL)
-        fprintf(out, "lw $t0 %s\n", instr.dst->u.id);
+        fprintf(out, "la $t0 %s\n", instr.dst->u.id);
     else
         fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location); // return value in v0
     fprintf(out, "lw $ra, 0($sp)\n");    // load return pointer
@@ -271,7 +271,7 @@ void genParam(struct code3add instr, FILE* out)
     break;
     default:
         if (instr.arg1->table->prev == NULL)
-            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+            fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
         else
             fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
