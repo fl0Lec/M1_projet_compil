@@ -65,12 +65,12 @@ int main(int argc, char** argv)
     int r = yyparse();
 
     if (r != 0)
-        return -1;
+        exit(1);
 
     struct symbole* s=lookupST("main");
     if (!s || s->kind!=FUN || s->type.desc->nbArg!=0 || s->type.desc->ret!=VOID_T){
         fprintf(stderr, "erreur programme doit contenir fonction main sans paramètre\n");
-        return -1;
+        exit(1);
     }
     if (afficher_table)
         afficheAllST();
@@ -82,5 +82,5 @@ int main(int argc, char** argv)
     
     fclose(yyin);
     fclose(yyout);
-    return 0;
+    exit(0);
 }
