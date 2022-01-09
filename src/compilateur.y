@@ -158,6 +158,7 @@ type ID add_id_imm SEMICOLON declaration
     depilerST();
     $5->ret=VOID_T; 
     struct symbole*s=addST_fun($2, $5);
+    completeLabel($4, s);
     }
 | type ID PAR_O empile_fun method_decl_param PAR_C empile block depile {
     $5->context=symTab;
