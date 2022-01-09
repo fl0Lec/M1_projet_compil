@@ -1,0 +1,10 @@
+class Program {
+    int a;
+    int t[5];
+    void main() {
+        int i;
+        i=t[1];
+        t[2]=i+1;
+        return;
+    }
+}

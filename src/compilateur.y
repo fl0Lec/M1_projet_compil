@@ -87,6 +87,8 @@ struct comb
 %token ACO_O
 %token ACO_C
 %token COMA
+%token CRO_O
+%token CRO_F
 
 
 /* CONTROL STRUCTURES */
@@ -136,6 +138,7 @@ struct comb
 %type <comb> assign_for
 
 %type <list_addr> block statement list_statement
+%type <id> add_tab_imm
 
 %start program
 
@@ -151,6 +154,11 @@ check_program : %empty {
 declaration : 
 type ID add_id_imm SEMICOLON declaration 
 | type ID add_id_imm COMA liste_id SEMICOLON declaration 
+| type ID add_tab_imm CRO_O int_literal CRO_F SEMICOLON declaration {
+    if ($5<1)
+        error("tableau decalration minimum 1");
+    $3->u.val=$5;
+}
 | VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST();
@@ -169,6 +177,9 @@ type ID add_id_imm SEMICOLON declaration
 add_id_imm : %empty {addST_id(yylval.mot, last_type);}
 ;
 
+add_tab_imm : %empty {
+    $$=addST_tab(yylval.mot, last_type, 5);
+}
 empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
 
@@ -249,8 +260,11 @@ location assign_op expr SEMICOLON {
         error("expr NULL\n");
     if ($1->type.type==BOOL_T && $3->kind!=EXPR_B)
         error("assignement entre variable bool et expression bool necessaire");
-    else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type)
+    else if ($1->type.type!=BOOL_T && $1->type.type!=$3->type.type){
+        afficheSymb($1);
+        afficheSymb($3);
         error("assignement entre variable de different type");
+    }
     else if ($1->type.type==BOOL_T && $2!=NORMAL_ASSIGN){
         error("seulement l'affectation est valide pour les boolean");
     }
@@ -358,6 +372,27 @@ location
         fprintf(stderr, "%s ",$1);
         error("location ne peut pas être un identificateur de fonction\n");
     }
+}
+| ID CRO_O expr CRO_F {
+    struct symbole* s=lookupST($1);
+    printf("location tab\n");
+    if (!s){
+        afficherST();
+        fprintf(stderr, "no entry in table for %s\n", $1);
+        exit(1);
+    }
+    if (s->kind!=TAB){
+        fprintf(stderr, "%s", $1);
+        error(" attend un tableau avant crochet");
+    }
+    if ($3->type.type!=INT_T){
+        fprintf(stderr, "%s", $1);
+        error(" attend entier dans crochet");
+    }
+    $$=newtemp();
+    $$->type.type=s->type.type;
+    $$->kind=TEMPO_TAB;
+    gencode(loadT, s, $3, $$);
 }
 ;
 

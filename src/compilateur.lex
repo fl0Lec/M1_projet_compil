@@ -75,6 +75,8 @@ true {return TRUE;}
 [}] {return ACO_C;} 
 [,] {return COMA;}
 [;] {return SEMICOLON;}
+[[] {return CRO_O;}
+[]] {return CRO_F;}
 
 \= {return ASSIGN;}
 \+\= {return ASSIGN_PLUS;}

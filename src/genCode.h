@@ -4,7 +4,7 @@
 #include "symTab.h"
 
 
-enum Operation {load, loadimm, store, add, sub, mul, divi, mod,
+enum Operation {load, loadT, loadimm, store, add, sub, mul, divi, mod,
                 eq, noteq, inf, infeq, sup, supeq, goto_op, and, or, //and et or ne se retrouve pas dans genCode
                 param, call, label, ret};
 
@@ -12,6 +12,7 @@ enum Assign_op_type {NORMAL_ASSIGN, ADD_ASSIGN, SUB_ASSIGN};
 
 static char * const op_names[] = {
 	[load] =    "load",
+    [loadT] =   "loadTab",
 	[loadimm] = "loadimm",
 	[store] =   "store",
     [add] =     "add",

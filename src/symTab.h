@@ -20,7 +20,7 @@ struct fundesc {
 
 //liste chainée d'ID
 struct symbole {
-    enum  {TEMPO, EXPR_B, IDENT, TAB, FUN, CST_INT, CST_STR} kind;
+    enum  {TEMPO, TEMPO_TAB, EXPR_B, IDENT, TAB, FUN, CST_INT, CST_STR} kind;
     struct 
     {
         char* id;           //identifiant (variable, tableau, ou fonction)
@@ -63,6 +63,7 @@ void initST(void);
 
 //ajout une entrée dans la table des symbole
 struct symbole* addST_id(char *id, enum type type);
+struct symbole* addST_tab(char *id, enum type type, int taille);
 struct symbole* addST_constInt(int val, enum type type);
 struct symbole* addST_constStr(char* val);
 struct symbole* addST_fun(char *id, struct fundesc*);
@@ -88,6 +89,7 @@ void affichefundesc(struct fundesc*);
 
 static char * const kind_names[] = {
     [TEMPO] =   "temp",
+    [TEMPO_TAB]="temp tab",
     [EXPR_B]=   "expression bool",
 	[IDENT] =   "variable",
 	[TAB] =     "tableau",

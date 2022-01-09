@@ -145,6 +145,17 @@ struct symbole* addST_id(char *id, enum type type)
     return s; 
 }
 
+struct symbole* addST_tab(char *id, enum type type, int taille)
+{
+    checksize(symTab);
+    struct symbole* s= &(symTab->symb[symTab->size++]);
+    s->kind=TAB;
+    s->u.id=id;
+    s->u.val=taille;
+    s->type.type=type;
+    return s;
+}
+
 struct symbole* addST_temp()
 {
     checksize(symTab);
@@ -271,6 +282,7 @@ void afficheSymb(struct symbole* s)
     switch (s->kind)
     {
     case TEMPO:
+    case TEMPO_TAB:
     case IDENT:
     case TAB:
         printf("%s | location : %d", type_names[s->type.type], s->location);
