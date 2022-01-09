@@ -339,6 +339,7 @@ void genMips(FILE* out)
     fprintf(out, "#start program\n");
 
     fprintf(out, "\n.data\n");
+    for (; symTab->prev!=NULL; symTab = symTab->prev);
     for (size_t i=0;i<symTab->size;i++){
         s=symTab->symb[i];
         if (s.kind==IDENT)

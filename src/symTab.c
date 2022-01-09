@@ -279,7 +279,7 @@ void afficheSymb(struct symbole* s)
         printf("const int | val : %d", s->u.val);
         break;
     case CST_STR:
-        printf("const str | mot :%s", s->u.str);
+        printf("const str | id : %s | str : %s", s->u.id, s->u.str);
         break;
     case FUN:
         if (!s->type.desc)
