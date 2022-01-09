@@ -94,6 +94,7 @@ void initST(void)
     s=malloc(sizeof(char)*(strlen("WriteInt")+1));
     strcpy(s, "WriteInt");
     addST_fun(s, desc);
+
     desc=malloc(sizeof(struct fundesc));
     desc->nbArg=1;
     desc->ret=VOID_T;
@@ -136,8 +137,7 @@ struct symbole* addST_id(char *id, enum type type)
     check_idST(id);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=IDENT;
-    s->u.id=malloc(sizeof(char)*(strlen(id)+1));
-    strncpy(s->u.id, id, strlen(id));
+    s->u.id=id;
     s->type.type=type;
     symTab->lastloc+=allignement(TEMP);
     s->location=symTab->lastloc;

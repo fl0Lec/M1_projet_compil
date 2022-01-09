@@ -143,7 +143,7 @@ struct comb
 
 %%
 
-program : CLASS ID check_program ACO_O declaration list_method_decl ACO_C
+program : CLASS ID check_program ACO_O declaration list_method_decl ACO_C {afficheAllST();printf("\n\n");}
 
 check_program : %empty {
     // si il y a quelque chose à faire du nom du programme (même nom que le fichier ...)
@@ -157,8 +157,8 @@ type ID add_id_imm SEMICOLON declaration
     $5->context=symTab;
     depilerST();
     $5->ret=VOID_T; 
-    struct symbole*s=addST_fun($2, $5); 
-    completeLabel($4, s);}
+    struct symbole*s=addST_fun($2, $5);
+    }
 | type ID PAR_O empile_fun method_decl_param PAR_C empile block depile {
     $5->context=symTab;
     depilerST(); 
@@ -236,7 +236,7 @@ empile : %empty {empilerST();}
 depile : %empty {depilerST();}
 ;
 
-list_statement : %empty {$$=NULL;}
+list_statement : %empty    {$$=NULL;}
 | statement list_statement {$$=concat($1, $2);}
 ;
 
@@ -278,7 +278,7 @@ location assign_op expr SEMICOLON {
         }
     }
 }
-| method_call SEMICOLON {gencode(call, $1, NULL, NULL);}
+| method_call SEMICOLON {$$=0; gencode(call, $1, NULL, NULL);}
 | IF PAR_O expr PAR_C next_ligne empile block depile else_bloc { //$6 -> $7 $7->$9
     $$=$7;
     complete($3->true, $5);
@@ -382,6 +382,7 @@ method_call
         (s?affichefundesc(s->type.desc):0);
         error("erreur argument different");
     }
+    printf("methode call on %s\n", $1);
     $$=s;
     
 } // fonction
