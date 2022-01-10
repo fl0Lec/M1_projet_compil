@@ -6,7 +6,6 @@
 #include <string.h>
 
 //les diffferents type
-//TODO string 
 enum type {BOOL_T, INT_T, STRING_T, VOID_T, TEMP, ADDR};
 
 //descripteur de fonction
@@ -31,7 +30,7 @@ struct symbole {
         struct fundesc* desc;
         enum type type;
     } type;
-    int location;           //emplacement memoire (comment faire pour fonction ? -1 ?)
+    int location;
     struct list_addr *true, *false; //quand expression boolean
     struct symTab* table;    // la table qui le contient
 };

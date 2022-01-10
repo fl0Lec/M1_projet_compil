@@ -289,8 +289,10 @@ void afficheSymb(struct symbole* s)
     case TEMPO:
     case TEMPO_TAB:
     case IDENT:
-    case TAB:
         printf("%s | location : %d", type_names[s->type.type], s->location);
+        break;
+    case TAB:
+        printf("%s | taille : %d", type_names[s->type.type], s->u.val);
         break;
     case CST_INT:
         printf("const int | val : %d", s->u.val);

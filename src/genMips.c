@@ -355,6 +355,9 @@ void genMips(FILE* out)
             fprintf(out, "%s:\t.word 0\n",s.u.id);
         else if (s.kind == CST_STR) 
             fprintf(out, "%s:\t.asciiz %s\n",s.u.id, s.u.str);
+        else if (s.kind == TAB) {
+            
+        }
     }
 
     fprintf(out, "\n.text\n.globl main\nj main\n\n");
