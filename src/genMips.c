@@ -304,10 +304,27 @@ void genLabel(struct code3add instr, FILE* out)
 void genReturn(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# return\n");
-    if (instr.dst!=NULL && instr.dst->table->prev == NULL)
-        fprintf(out, "lw $t0 %s\n", instr.dst->u.id);
-    else if (instr.dst!=NULL)
-        fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location); // return value in v0
+    if (instr.dst!=NULL) {
+        switch (instr.dst->kind)
+        {
+        case TEMPO_TAB:
+            if (instr.dst->table->prev == NULL)
+                fprintf(out, "lw $t2 %s\n", instr.dst->u.id);
+            else
+                fprintf(out, "lw $t2, %d($sp)\n", instr.dst->location);
+            fprintf(out, "lw $v0 ($t2)\n");
+        break;
+        case CST_INT:
+            fprintf(out, "li $v0, %d\n", instr.dst->u.val);
+        break;
+        default:
+            if (instr.dst->table->prev == NULL)
+                fprintf(out, "lw $v0 %s\n", instr.dst->u.id);
+            else
+                fprintf(out, "lw $v0, %d($sp)\n", instr.dst->location);
+        break;
+        }
+    }
     fprintf(out, "lw $ra, 0($sp)\n");    // load return pointer
     fprintf(out, "addiu $sp, $sp, 4\n");
     fprintf(out, "jr $ra\n\n");
