@@ -1,7 +1,7 @@
 #include "symTab.h"
 #include "genCode.h"
 
-#define TAILLE_INIT 256
+#define TAILLE_INIT 512
 #define MAX(a, b) (a>b?a:b)
 //sur quelle valeur un type doit être aligné en mémoire
 size_t allignement(enum type t){
