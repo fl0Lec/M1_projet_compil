@@ -26,6 +26,13 @@ void genLoadForOP(struct code3add instr, FILE* out)
     case CST_INT:
         fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
+    case TEMPO_TAB:
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+        else
+            fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
+        fprintf(out, "lw $t0 ($t0)\n");
+    break;
     default:
         if (instr.arg1->table->prev == NULL)
             fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
@@ -39,6 +46,13 @@ void genLoadForOP(struct code3add instr, FILE* out)
     case CST_INT:
         fprintf(out, "li $t1 %d\n", instr.arg2->u.val);
     break;
+    case TEMPO_TAB:
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t1 %s\n", instr.arg2->u.id);
+        else
+            fprintf(out, "lw $t1 %d($sp)\n", instr.arg2->location);
+        fprintf(out, "lw $t1 ($t1)\n");
+    break;
     default:
         if (instr.arg2->table->prev == NULL)
             fprintf(out, "lw $t1 %s\n", instr.arg2->u.id);
@@ -49,7 +63,13 @@ void genLoadForOP(struct code3add instr, FILE* out)
 }
 void genStoreForOp(struct code3add instr, FILE* out)
 {
-    if (instr.dst->table->prev == NULL)
+    if (instr.dst->kind == TEMPO_TAB) {
+        if (instr.dst->table->prev == NULL)
+            fprintf(out, "lw $t2 %s\n", instr.dst->u.id);
+        else
+            fprintf(out, "lw $t2, %d($sp)\n", instr.dst->location);
+        fprintf(out, "sw $t0 ($t2)\n");
+    } else if (instr.dst->table->prev == NULL)
         fprintf(out, "sw $t0 %s\n", instr.dst->u.id);
     else
         fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
@@ -88,11 +108,18 @@ void genLoadT(struct code3add instr, FILE* out)
             fprintf(out, "lw $t0 %s\n", instr.arg2->u.id);
         else
             fprintf(out, "lw $t0, %d($sp)\n", instr.arg2->location);
-        fprintf(out, "lw $t0, $t0($t1)\n");
     break;
     }
     
-    genStoreForOp(instr, out);
+    fprintf(out, "li $t2, 4\n");
+    fprintf(out, "mult $t0 $t2\n");
+    fprintf(out, "mflo $t0\n");
+    fprintf(out, "addu $t0, $t0, $t1\n");
+    
+    if (instr.dst->table->prev == NULL)
+        fprintf(out, "sw $t0 %s\n", instr.dst->u.id);
+    else
+        fprintf(out, "sw $t0, %d($sp)\n", instr.dst->location);
 }
 
 void genAdd(struct code3add instr, FILE* out)
@@ -294,14 +321,19 @@ void genParam(struct code3add instr, FILE* out)
     case CST_INT:
         fprintf(out, "li $t0 %d\n", instr.arg1->u.val);
     break;
+    case CST_STR:
+        fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
+    break;
+    case TEMPO_TAB:
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
+        else
+            fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
+        fprintf(out, "lw $t0 ($t0)\n");
+    break;
     default:
-        if (instr.arg1->table->prev == NULL){
-            if (instr.arg1->kind==CST_STR){
-                fprintf(out, "la $t0 %s\n", instr.arg1->u.id);
-            } else {
-                fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
-            }
-        }
+        if (instr.arg1->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg1->u.id);
         else
             fprintf(out, "lw $t0 %d($sp)\n", instr.arg1->location);
     break;
@@ -335,12 +367,21 @@ void genCall(struct code3add instr, FILE* out)
     else // fonctions prédéfinies
         fprintf(out, "addiu $sp, $sp, 4\n");
 
-    if (instr.dst != NULL) {
-        fprintf(out, "sw $v0, %d($sp)\n", instr.dst->location);
+    if (instr.dst != NULL) {    // store valeur de retour
+        fprintf(out, "move $t0, $v0\n");
+        genStoreForOp(instr, out);
     }
+
     if (strcmp("ReadInt", instr.arg1->u.id) == 0) {
         struct code3add param = genCode.tab[genCode.current-2];
-        if (param.arg1->table->prev == NULL)
+        if (param.arg1->kind == TEMPO_TAB) {
+            if (param.arg1->table->prev == NULL)
+                fprintf(out, "sw $t0 %s\n", param.arg1->u.id);
+            else
+                fprintf(out, "sw $t0, %d($sp)\n", param.arg1->location);
+            fprintf(out, "sw $v0 $t0\n");
+        }
+        else if (param.arg1->table->prev == NULL)
             fprintf(out, "sw $v0 %s\n", param.arg1->u.id);
         else
             fprintf(out, "sw $v0 %d($sp)\n", param.arg1->location);
