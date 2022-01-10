@@ -352,8 +352,10 @@ void genParam(struct code3add instr, FILE* out)
 
 void genCall(struct code3add instr, FILE* out)
 {
-    currentParam = 0;
     fprintf(out, "\n# call\n");
+
+    if (instr.arg1->type.desc->nbArg > 0)
+        currentParam -= instr.arg1->type.desc->nbArg;
 
     if(instr.arg1->type.desc->context != NULL)
         fprintf(out, "subu $sp, $sp, %d\n", instr.arg1->type.desc->context->maxloc);

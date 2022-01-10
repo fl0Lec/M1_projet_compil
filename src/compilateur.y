@@ -444,7 +444,7 @@ method_call
     struct symbole* s=lookupST($1);
     if (!s){
         fprintf(stderr, "pour %s ",$1);
-        error("identificateur de fonction inconnu);
+        error("identificateur de fonction inconnu");
     }
     if (s->kind!=FUN){
         fprintf(stderr, "%s :", $1);
