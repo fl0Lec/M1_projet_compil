@@ -7,6 +7,7 @@
 %}
 
 %option nounput
+%option noinput
 %option noyywrap
 
 CHAR [[:alpha:][:digit:]#_]

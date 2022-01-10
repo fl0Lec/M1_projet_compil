@@ -34,5 +34,8 @@ doc:
 clean:
 	rm -rf out bin doc decaf src/compilateur.tab.h src/compilateur.tab.c src/lex.yy.c
 
+cleandts:
+	rm -rf dts/*/*.cerr dts/*/*.mips dts/*/*.xout
+
 test: test.sh decaf
 	./test.sh

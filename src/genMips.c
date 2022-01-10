@@ -398,6 +398,7 @@ void genIOFunctions(FILE* out)
     fprintf(out, "\nWriteInt:\n  lw $a0 0($sp)\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 1\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
     //read_int : read int vers $v0
     fprintf(out, "\nReadInt:\n  subu $sp $sp 4\n  sw $ra 0($sp)\n  li $v0 5\n  syscall\n  lw $ra 0($sp)\n  addiu $sp, $sp, 4\n  jr $ra\n");
+
 }
 
 // --------------------------------------
