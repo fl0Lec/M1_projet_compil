@@ -8,6 +8,10 @@ class Program {
         t[2]=i+1;
         tab[0] = 4;
         WriteInt(tab[0]);
+        WriteString(" ");
+        WriteInt(tab[2]);
+        WriteString(" ");
+        WriteInt(i);
         return;
     }
 }

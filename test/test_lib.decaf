@@ -1,8 +1,9 @@
 class Program {
     void main(){
         int i;
-        WriteString("rentrez ");
+        WriteString("rentrez \n");
         ReadInt(i);
+        WriteString("\n");
         //WriteString("vous avez rentrez : ");
         WriteInt(i);
     }

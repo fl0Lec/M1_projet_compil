@@ -154,8 +154,13 @@ int check_return_fun(enum type t, size_t start, size_t stop)
         nbr=-1+check_return_fun(t, genCode.tab[start].dst->u.val, stop)+check_return_fun(t, start+1, stop);
         break;
     case ret :
-        if (t==VOID_T)
+        if (t==VOID_T){
+            if (genCode.tab[start].dst){
+                fprintf(stderr, "void fun attend aucun paramètre\n");
+                exit(1);
+            }
             nbr=1;
+        }
         else {
             if (!genCode.tab[start].dst || genCode.tab[start].dst->type.type!=t){
                 fprintf(stderr, "retour non valide dans fonciton\n");
@@ -168,5 +173,9 @@ int check_return_fun(enum type t, size_t start, size_t stop)
         nbr=0;
         break;
     }
-    return nbr;
+    if (start==stop)
+        return nbr;
+    else {
+        return nbr+check_return_fun(t, start, stop);
+    }
 }

@@ -166,7 +166,6 @@ type ID add_id_imm SEMICOLON declaration
     $3->u.val=$5;
 }
 | VOID_TYPE ID PAR_O add_fun_imm  empile_fun method_decl_param PAR_C empile block depile {
-    check_return_fun(VOID_T, $4->u.val, genCode.size-1);
     $6->context=symTab;
     depilerST();
     $6->ret=VOID_T; 
@@ -175,8 +174,6 @@ type ID add_id_imm SEMICOLON declaration
     gencode(ret, 0, 0, 0);
     }
 | type ID PAR_O add_fun_imm empile_fun method_decl_param PAR_C empile block depile {
-    if (!check_return_fun(VOID_T, $4->u.val, genCode.size-1))
-        error("compileur reach end of non void fun");
     $6->context=symTab;
     depilerST(); 
     $6->ret=$1; 
@@ -234,7 +231,6 @@ field_decl : type liste_id SEMICOLON {
 ; 
 
 method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
-    check_return_fun(VOID_T, $3->u.val, genCode.size-1);
     $6->context=symTab;
     depilerST(); 
     $6->ret=VOID_T; 
@@ -246,8 +242,6 @@ method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C 
     }
     }
 | type ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
-    if (!check_return_fun(VOID_T, $3->u.val, genCode.size-1))
-        error("compileur reach end of non void fun");
     $6->context=symTab;
     depilerST();
     $6->ret=$1;
