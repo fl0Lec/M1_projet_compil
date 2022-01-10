@@ -237,6 +237,9 @@ method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C 
     $3->type.desc=$6;
     completeLabel($4, $3);
     gencode(ret, 0, 0, 0);
+    if ($9!=NULL){
+        error("break hors boucle detecter");
+    }
     }
 | type ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
     $6->context=symTab;
@@ -336,21 +339,26 @@ location assign_op expr SEMICOLON {
     } else {
         complete($3->false, genCode.size);
     } 
-    $$=0;
 }
 | FOR assign_for empile block {
     gencode(add, addST_constInt(1, INT_T), $2->s, $2->s);
     gencode(goto_op, 0, 0, addST_constInt($2->quad, INT_T));
-    printf("complete1\n");
     complete($2->la, genCode.size);
     depilerST();
-    printf("complete2\n");
     complete($4, genCode.size); // TODO SEGFAULT ($4 = NULL?)
-    printf("complete3\n");
     $$=0;
 }
 | RETURN SEMICOLON      {$$=NULL;gencode(ret, NULL, NULL, NULL);}
-| RETURN expr SEMICOLON {$$=NULL;gencode(ret, NULL, NULL, $2);}
+| RETURN expr SEMICOLON {
+    $$=NULL;
+    if ($2->kind!=EXPR_B)
+        gencode(ret, NULL, NULL, $2);
+    else {
+        complete($2->true, genCode.size);
+        complete($2->false, genCode.size);
+        gencode(ret, NULL, NULL, addST_constInt(1,INT_T));
+        gencode(ret, NULL, NULL, addST_constInt(0,INT_T));
+    }}
 | BREAK SEMICOLON       {$$=creerlist(genCode.size); gencode(goto_op, 0,0,0);}
 | CONTINUE SEMICOLON    {$$=NULL;}
 | empile block depile   {$$=$2;}
@@ -454,9 +462,10 @@ method_call
         fprintf(stderr, "pour %s ",$1);
         error("identificateur de fonction non trouver");
     }
-    if (!compfundesc(s->type.desc, $3)){
+    if (s->type.desc->nbArg!=-1 && !compfundesc(s->type.desc, $3)){
         affichefundesc($3);
         (s?affichefundesc(s->type.desc):0);
+        fprintf(stderr,"%s : ", $1);
         error("erreur argument different");
     }
     $$=s;

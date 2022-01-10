@@ -231,6 +231,10 @@ void genSupeq(struct code3add instr, FILE* out)
 void genGoto(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# goto\n");
+    if (!instr.dst){
+        fprintf(stderr, "goto null detect break hors for ?\n");
+        exit(1);
+    }
     switch (instr.dst->kind)
     {
     case CST_INT:
