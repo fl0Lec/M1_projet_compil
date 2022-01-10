@@ -444,7 +444,7 @@ method_call
     struct symbole* s=lookupST($1);
     if (!s){
         fprintf(stderr, "pour %s ",$1);
-        error("identificateur de fonction non trouver");
+        error("identificateur de fonction inconnu);
     }
     if (s->kind!=FUN){
         fprintf(stderr, "%s :", $1);
@@ -460,7 +460,7 @@ method_call
     struct symbole* s=lookupST($1);
     if (!s){
         fprintf(stderr, "pour %s ",$1);
-        error("identificateur de fonction non trouver");
+        error("identificateur de fonction inconnu");
     }
     if (s->type.desc->nbArg!=-1 && !compfundesc(s->type.desc, $3)){
         affichefundesc($3);

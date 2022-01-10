@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 
     struct symbole* s=lookupST("main");
     if (!s || s->kind!=FUN || s->type.desc->nbArg!=0 || s->type.desc->ret!=VOID_T){
-        fprintf(stderr, "erreur programme doit contenir fonction main sans paramètre\n");
+        fprintf(stderr, "erreur programme doit contenir fonction `void main()`\n");
         afficheAllST();
         exit(1);
     }
