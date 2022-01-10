@@ -187,7 +187,6 @@ add_id_imm : %empty {addST_id(yylval.mot, last_type);}
 
 add_tab_imm : %empty {
     $$=addST_tab(yylval.mot, last_type, 5);
-    printf("tab : %s\n", yylval.mot);
 }
 ;
 
@@ -237,9 +236,9 @@ method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C 
     $3->type.desc=$6;
     completeLabel($4, $3);
     gencode(ret, 0, 0, 0);
-    if ($9!=NULL){
+    /*if ($9!=NULL){
         error("break hors boucle detecter");
-    }
+    }*/
     }
 | type ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
     $6->context=symTab;
@@ -418,7 +417,6 @@ location
 }
 | ID CRO_O expr CRO_F {
     struct symbole* s=lookupST($1);
-    printf("location tab\n");
     if (!s){
         afficherST();
         fprintf(stderr, "no entry in table for %s\n", $1);
@@ -509,9 +507,19 @@ expr
 | method_call {
     if ($1->type.desc->ret==VOID_T)
         error("fonction sans retour dans expression");
-    $$=newtemp();
-    $$->type.type=$1->type.desc->ret;
-    gencode(call, $1, NULL, $$);
+    if ($1->type.desc->ret==BOOL_T){
+        struct symbole* t=newtemp();
+        gencode(call, $1, NULL, $$);
+        $$=addST_exprbool();
+        $$->true=creerlist(genCode.size);
+        $$->false=creerlist(genCode.size+1);
+        gencode(eq, t, addST_constInt(1, INT_T), 0);
+        gencode(goto_op, 0, 0, 0);
+    } else {
+        $$=newtemp();
+        $$->type.type=$1->type.desc->ret;
+        gencode(call, $1, NULL, $$);
+    }
 }
 | literal   {
     if ($1->type.type==BOOL_T){
