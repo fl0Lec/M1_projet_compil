@@ -91,5 +91,8 @@ void completeLabel(struct list_addr*, struct symbole*);
 
 //affiche list addr
 void afficheLA(struct list_addr* l);
+
+//check si return entre start et stop
+int check_return_fun(enum type t, size_t start, size_t stop);
 #endif
 

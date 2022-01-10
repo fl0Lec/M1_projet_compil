@@ -166,6 +166,7 @@ type ID add_id_imm SEMICOLON declaration
     $3->u.val=$5;
 }
 | VOID_TYPE ID PAR_O add_fun_imm  empile_fun method_decl_param PAR_C empile block depile {
+    check_return_fun(VOID_T, $4->u.val, genCode.size-1);
     $6->context=symTab;
     depilerST();
     $6->ret=VOID_T; 
@@ -174,6 +175,8 @@ type ID add_id_imm SEMICOLON declaration
     gencode(ret, 0, 0, 0);
     }
 | type ID PAR_O add_fun_imm empile_fun method_decl_param PAR_C empile block depile {
+    if (!check_return_fun(VOID_T, $4->u.val, genCode.size-1))
+        error("compileur reach end of non void fun");
     $6->context=symTab;
     depilerST(); 
     $6->ret=$1; 
@@ -231,6 +234,7 @@ field_decl : type liste_id SEMICOLON {
 ; 
 
 method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
+    check_return_fun(VOID_T, $3->u.val, genCode.size-1);
     $6->context=symTab;
     depilerST(); 
     $6->ret=VOID_T; 
@@ -242,6 +246,8 @@ method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C 
     }
     }
 | type ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
+    if (!check_return_fun(VOID_T, $3->u.val, genCode.size-1))
+        error("compileur reach end of non void fun");
     $6->context=symTab;
     depilerST();
     $6->ret=$1;
@@ -614,27 +620,93 @@ expr
     gencode(goto_op, NULL, NULL, NULL);
     $$=t;
 }
-| expr EQ expr {
+| expr EQ next_ligne expr {
     struct symbole* t;
     t=addST_exprbool();
-    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
-        error("erreur de type doit être de type int");
-    t->true=creerlist(genCode.size);
-    t->false=creerlist(genCode.size+1);
-    gencode(eq, $1, $3, NULL);
-    gencode(goto_op, NULL, NULL, NULL);
-    $$=t;
+    if (!$1 || !$4)
+        error("error expr null");
+    else {
+        if ($1->type.type!=INT_T && $1->kind!=EXPR_B)
+            error("erreur de type doit être de type int ou bool");
+        if ($1->type.type==INT_T && ($4->type.type!=INT_T || $4->kind==EXPR_B))
+            error("attend deux int ou deux bool");
+        if ($1->kind==EXPR_B && $4->kind!=EXPR_B)
+            error("attend deux int ou deux bool");
+    }
+    if ($1->type.type==INT_T){
+        t->true=creerlist(genCode.size);
+        t->false=creerlist(genCode.size+1);
+        gencode(eq, $1, $4, NULL);
+        gencode(goto_op, NULL, NULL, NULL);
+        $$=t;
+    } else {
+        struct symbole* t1=newtemp(), *t2=newtemp();
+        t1->type.type=BOOL_T; t2->type.type=BOOL_T;
+        //complete $1
+        complete($1->true, genCode.size);
+        gencode(store, addST_constInt(1, BOOL_T), 0, t1);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
+        complete($1->false, genCode.size);
+        gencode(store, addST_constInt(0, BOOL_T), 0, t1);
+        gencode(goto_op, 0, 0, addST_constInt($3, INT_T));
+        //complete $4
+        complete($4->true, genCode.size);
+        gencode(store, addST_constInt(1, BOOL_T), 0, t2);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
+        complete($4->false, genCode.size);
+        gencode(store, addST_constInt(0, BOOL_T), 0, t2);
+        //verfie egual
+        t->true=creerlist(genCode.size);
+        t->false=creerlist(genCode.size+1);
+        gencode(eq, t1, t2, 0);
+        gencode(goto_op, 0, 0, 0);
+        $$=t;
+
+    }
 }
-| expr NOT_EQ expr {
+| expr NOT_EQ next_ligne expr {
     struct symbole* t;
     t=addST_exprbool();
-    if (!$1 || $1->type.type!=INT_T || !$3 || $3->type.type!=INT_T)
-        error("erreur de type doit être de type int");
-    t->true=creerlist(genCode.size);
-    t->false=creerlist(genCode.size+1);
-    gencode(noteq, $1, $3, NULL);
-    gencode(goto_op, NULL, NULL, NULL);
-    $$=t;
+    if (!$1 || !$4)
+        error("error expr null");
+    else {
+        if ($1->type.type!=INT_T && $1->kind!=EXPR_B)
+            error("erreur de type doit être de type int ou bool");
+        if ($1->type.type==INT_T && ($4->type.type!=INT_T || $4->kind==EXPR_B))
+            error("attend deux int ou deux bool");
+        if ($1->kind==EXPR_B && $4->kind!=EXPR_B)
+            error("attend deux int ou deux bool");
+    }
+    if ($1->type.type==INT_T){
+        t->true=creerlist(genCode.size);
+        t->false=creerlist(genCode.size+1);
+        gencode(noteq, $1, $4, NULL);
+        gencode(goto_op, NULL, NULL, NULL);
+        $$=t;
+    } else {
+        struct symbole* t1=newtemp(), *t2=newtemp();
+        t1->type.type=BOOL_T; t2->type.type=BOOL_T;
+        //complete $1
+        complete($1->true, genCode.size);
+        gencode(store, addST_constInt(1, BOOL_T), 0, t1);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
+        complete($1->false, genCode.size);
+        gencode(store, addST_constInt(0, BOOL_T), 0, t1);
+        gencode(goto_op, 0, 0, addST_constInt($3, INT_T));
+        //complete $4
+        complete($4->true, genCode.size);
+        gencode(store, addST_constInt(1, BOOL_T), 0, t2);
+        gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
+        complete($4->false, genCode.size);
+        gencode(store, addST_constInt(0, BOOL_T), 0, t2);
+        //verfie egual
+        t->true=creerlist(genCode.size);
+        t->false=creerlist(genCode.size+1);
+        gencode(noteq, t1, t2, 0);
+        gencode(goto_op, 0, 0, 0);
+        $$=t;
+
+    }
     /////////////////and-or
 }
 
