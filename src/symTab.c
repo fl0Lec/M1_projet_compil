@@ -161,9 +161,8 @@ struct symbole* addST_temp()
     checksize(symTab);
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=TEMPO;
-    s->u.id=malloc(sizeof(char)*(1+sizeof(size_t)));
-    s->u.id[0]='t';
-    sprintf(s->u.id+1, "%ld", symTab->nbTemp++);
+    s->u.id=malloc(30);
+    sprintf(s->u.id, "t.%ld", symTab->nbTemp++);
     symTab->lastloc+=allignement(TEMP);
     s->location=symTab->lastloc;
     s->table = symTab;
@@ -216,11 +215,7 @@ struct symbole* addST_fun(char *id, struct fundesc* fundesc)
     struct symbole* s= &(symTab->symb[symTab->size++]);
     s->kind=FUN;
     s->u.id=id;
-    /*
-    s->u.id=malloc(sizeof(char)*(strlen(id)));
-    strncpy(s->u.id, id, strlen(id));
-    s->u.id[strlen(id)]='\0';
-    //printf("|new fun : %s %s\n", s->u.id, id);*/
+    
     if (fundesc)
         s->type.desc=fundesc;
     else {

@@ -452,7 +452,7 @@ void genMips(FILE* out)
     fprintf(out, "\n\n");
     while(genCode.current < genCode.size)
     {
-        fprintf(out, "\nline.%d:", genCode.current);
+        fprintf(out, "\nline.%ld:", genCode.current);
         instr = genCode.tab[genCode.current++];
         //printf("line %d\n", genCode.current);
         switch (instr.op) {
@@ -521,7 +521,7 @@ void genMips(FILE* out)
             break;
         }
     }
-    fprintf(out, "\nline.%d:\nprogram.exit:", genCode.current);
+    fprintf(out, "\nline.%ld:\nprogram.exit:", genCode.current);
     fprintf(out, "\n# Program exit\nli $v0 10\nsyscall\n");
 }
 
