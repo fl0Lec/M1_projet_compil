@@ -315,7 +315,7 @@ void genReturn(struct code3add instr, FILE* out)
             fprintf(out, "lw $v0 ($t2)\n");
         break;
         case CST_INT:
-            fprintf(out, "li $v0 %d\n", instr.dst->u.val);
+            fprintf(out, "li $v0, %d\n", instr.dst->u.val);
         break;
         default:
             if (instr.dst->table->prev == NULL)

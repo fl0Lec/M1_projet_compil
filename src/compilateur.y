@@ -474,22 +474,22 @@ method_call
 ;
 
 method_call_args
-: method_call_args COMA expr {
+: expr COMA method_call_args  {
     struct symbole* t;
-    $$=$1;
-    if ($3->kind==EXPR_B){
+    $$=$3;
+    if ($1->kind==EXPR_B){
         t=newtemp();
         t->type.type=BOOL_T;
-        complete($3->true, genCode.size);
-        complete($3->false, genCode.size+2);
+        complete($1->true, genCode.size);
+        complete($1->false, genCode.size+2);
         gencode(store, addST_constInt(1, INT_T), NULL, t);
         gencode(goto_op, 0, 0, addST_constInt(genCode.size+2, INT_T));
         gencode(store, addST_constInt(0, INT_T), NULL, t);
-        $3=t;
+        $1=t;
 
     }
-    addtypefd($$, $3->type.type);
-    gencode(param, $3, NULL, NULL);
+    addtypefd($$, $1->type.type);
+    gencode(param, $1, NULL, NULL);
     }
 | expr {$$=initfun(); addtypefd($$, $1->type.type); gencode(param, $1, NULL, NULL);}
 ;
