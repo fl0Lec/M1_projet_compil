@@ -54,11 +54,11 @@ void resumeSYmbole(struct symbole* s)
 
 void affiche3add(struct code3add *line)
 {
-    printf("op : %s\targ1 : \n",op_names[line->op]);
+    printf("op : %s\targ1 : ",op_names[line->op]);
     resumeSYmbole(line->arg1);
-    printf("\targ2 : \n");
+    printf("\targ2 : ");
     resumeSYmbole(line->arg2);
-    printf("\tdst : \n");
+    printf("\tdst : ");
     resumeSYmbole(line->dst);
     printf("\n");
 }
