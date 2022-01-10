@@ -1,10 +1,13 @@
 class Program {
     int a;
     int t[5], tab[10];
+    void test() {return;}
     void main() {
         int i;
         i=t[1];
         t[2]=i+1;
+        tab[0] = 4;
+        WriteInt(tab[0]);
         return;
     }
 }

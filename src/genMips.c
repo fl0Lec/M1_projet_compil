@@ -74,6 +74,27 @@ void genStore(struct code3add instr, FILE* out)
     genStoreForOp(instr, out);
 }
 
+void genLoadT(struct code3add instr, FILE* out)
+{
+    fprintf(out, "\n# load tab\n");
+    fprintf(out, "la $t1, %s\n", instr.arg1->u.id);
+    switch (instr.arg2->kind)
+    {
+    case CST_INT:
+        fprintf(out, "li $t0, %d\n", instr.arg2->u.val);
+    break;
+    default:
+        if (instr.arg2->table->prev == NULL)
+            fprintf(out, "lw $t0 %s\n", instr.arg2->u.id);
+        else
+            fprintf(out, "lw $t0, %d($sp)\n", instr.arg2->location);
+        fprintf(out, "lw $t0, $t0($t1)\n");
+    break;
+    }
+    
+    genStoreForOp(instr, out);
+}
+
 void genAdd(struct code3add instr, FILE* out)
 {
     fprintf(out, "\n# add\n");
@@ -356,11 +377,15 @@ void genMips(FILE* out)
         else if (s.kind == CST_STR) 
             fprintf(out, "%s:\t.asciiz %s\n",s.u.id, s.u.str);
         else if (s.kind == TAB) {
-            
+            fprintf(out, "%s:\t.word 0",s.u.id);
+            for (int i=1; i<s.u.val; i++) {
+                fprintf(out, ", 0");
+            }
+            fprintf(out, "\n");
         }
     }
 
-    fprintf(out, "\n.text\n.globl main\nj main\n\n");
+    fprintf(out, "\n.text\n.globl main\njal main\nj program.exit\n\n");
     
     genIOFunctions(out);
     
@@ -428,12 +453,15 @@ void genMips(FILE* out)
             case param: 
                 genParam(instr, out);
             break;
+            case loadT:
+                genLoadT(instr, out);
+            break;
             default:
                 fprintf(stderr, "operation non reconnue\n");
             break;
         }
     }
-    fprintf(out, "\nline.%d:", genCode.current);
+    fprintf(out, "\nline.%d:\nprogram.exit:", genCode.current);
     fprintf(out, "\n# Program exit\nli $v0 10\nsyscall\n");
 }
 
