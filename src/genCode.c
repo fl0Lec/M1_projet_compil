@@ -137,5 +137,36 @@ void afficheLA(struct list_addr* l)
         e=e->next;
     }
     printf("\n");
-    
+}
+
+int check_return_fun(enum type t, size_t start, size_t stop)
+{
+    int nbr=0;
+    switch (genCode.tab[start].op)
+    {
+    case eq:
+    case noteq:
+    case inf:
+    case infeq:
+    case sup:
+    case supeq:
+    case goto_op:
+        nbr=-1+check_return_fun(t, genCode.tab[start].dst->u.val, stop)+check_return_fun(t, start+1, stop);
+        break;
+    case ret :
+        if (t==VOID_T)
+            nbr=1;
+        else {
+            if (!genCode.tab[start].dst || genCode.tab[start].dst->type.type!=t){
+                fprintf(stderr, "retour non valide dans fonciton\n");
+                exit(1);
+            }
+            nbr=1;
+        }
+        break;
+    default:
+        nbr=0;
+        break;
+    }
+    return nbr;
 }
