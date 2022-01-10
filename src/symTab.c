@@ -46,7 +46,15 @@ size_t taille(struct symbole* id)
 void checksize(struct symTab* s){
     if (s->size==s->capacity){
         s->capacity*=2;
-        s->symb=realloc(s->symb, sizeof(struct symbole)*s->capacity);
+        struct symTab* oldPtr = s;
+        s->symb=malloc(sizeof(struct symbole)*s->capacity);
+        if (s->prev != NULL) {
+            int i=0;
+            for (i=0; &s->prev->fils[i] != &oldPtr; i++);
+            s->prev->fils[i] = s;
+        }
+        for (int i=0; i < s->size_fils; i++) s->fils[i]->prev = s;
+        free(oldPtr);
     }
 }
 /////////////////////////////////////////////////////////////
@@ -65,8 +73,11 @@ void empilerST(void)
     s->fils=malloc(sizeof(struct symTab *)*TAILLE_INIT);
     if (symTab){
         if (symTab->size_fils==s->capacity_fils){
+            struct symTab ** oldPtrs = symTab->fils;
             symTab->capacity*=2;
-            symTab->fils=realloc(symTab->fils, sizeof(struct symTab *)*symTab->capacity_fils);
+            symTab->fils=malloc(sizeof(struct symTab **)*symTab->capacity_fils);
+            for (int i = 0; i < symTab->size_fils; i++) symTab->fils[i] = oldPtrs[i];
+            free(oldPtrs);
         }
         symTab->fils[symTab->size_fils++]=s;
     }
