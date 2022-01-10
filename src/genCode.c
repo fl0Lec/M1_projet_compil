@@ -44,7 +44,7 @@ void resumeSYmbole(struct symbole* s)
         printf("(id:%s, str:%s)",s->u.id, s->u.str);
         break;
     case TEMPO_TAB :
-        printf("temp tab\n");
+        printf("temp tab");
         break;
     default:
         printf("%s", s->u.id);
