@@ -131,6 +131,7 @@ struct comb
 
 %type<fundesc> method_decl_param
 
+%type <id> add_fun_imm
 %type <list_addr> empile_fun
 
 %type <comb> else_bloc
@@ -164,19 +165,21 @@ type ID add_id_imm SEMICOLON declaration
         error("tableau declaration minimum 1");
     $3->u.val=$5;
 }
-| VOID_TYPE ID PAR_O  empile_fun method_decl_param PAR_C empile block depile {
-    $5->context=symTab;
+| VOID_TYPE ID PAR_O add_fun_imm  empile_fun method_decl_param PAR_C empile block depile {
+    $6->context=symTab;
     depilerST();
-    $5->ret=VOID_T; 
-    struct symbole*s=addST_fun($2, $5);
-    completeLabel($4, s);
+    $6->ret=VOID_T; 
+    $4->type.desc=$6;
+    completeLabel($5, $4);
+    gencode(ret, 0, 0, 0);
     }
-| type ID PAR_O empile_fun method_decl_param PAR_C empile block depile {
-    $5->context=symTab;
+| type ID PAR_O add_fun_imm empile_fun method_decl_param PAR_C empile block depile {
+    $6->context=symTab;
     depilerST(); 
-    $5->ret=$1; 
-    struct symbole *s=addST_fun($2, $5); 
-    completeLabel($4, s);}
+    $6->ret=$1; 
+    $4->type.desc=$6;
+    completeLabel($5, $4);
+    }
 ;
 
 add_id_imm : %empty {addST_id(yylval.mot, last_type);}
@@ -186,6 +189,10 @@ add_tab_imm : %empty {
     $$=addST_tab(yylval.mot, last_type, 5);
     printf("tab : %s\n", yylval.mot);
 }
+;
+
+add_fun_imm : %empty {$$=addST_fun(yylval.mot, 0);}
+;
 empile_fun : %empty {empilerST(); $$=creerlist(genCode.size); gencode(label, NULL, NULL, NULL);}
 ;
 
@@ -209,8 +216,8 @@ liste_id_init : %empty
 ;
 
 liste_id: %empty {}
-| ID add_id_imm 
-| ID add_id_imm COMA liste_id
+| ID add_id_imm {gencode(store, addST_constInt(0, INT_T),0, lookupST($1));}
+| ID add_id_imm COMA liste_id {gencode(store, addST_constInt(0, INT_T),0, lookupST($1));}
 ;
 
 list_method_decl : %empty
@@ -223,19 +230,22 @@ field_decl : type liste_id SEMICOLON {
 }
 ; 
 
-method_decl : VOID_TYPE ID empile_fun PAR_O method_decl_param PAR_C empile block depile {
-    $5->context=symTab;
+method_decl : VOID_TYPE ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
+    $6->context=symTab;
     depilerST(); 
-    $5->ret=VOID_T; 
-    struct symbole* s=addST_fun($2, $5); 
-    completeLabel($3, s);
+    $6->ret=VOID_T; 
+    $3->type.desc=$6;
+    completeLabel($4, $3);
+    gencode(ret, 0, 0, 0);
     }
-| type ID empile_fun PAR_O method_decl_param PAR_C empile block depile {
-    $5->context=symTab;
+| type ID add_fun_imm empile_fun PAR_O method_decl_param PAR_C empile block depile {
+    $6->context=symTab;
     depilerST();
-    $5->ret=$1;
-    struct symbole* s=addST_fun($2, $5); 
-    completeLabel($3, s);}
+    $6->ret=$1;
+    $3->type.desc=$6;
+    completeLabel($4, $3);
+    gencode(ret, 0, 0, 0);
+}
 ;
 
 method_decl_param : %empty {$$=malloc(sizeof(struct fundesc)); $$->nbArg=$$->capacity=0;$$->args=0;}
@@ -427,6 +437,10 @@ method_call
     if (!s){
         fprintf(stderr, "pour %s ",$1);
         error("identificateur de fonction non trouver");
+    }
+    if (s->kind!=FUN){
+        fprintf(stderr, "%s :", $1);
+        error("erreur attend une fonction");
     }
     if (s->type.desc->nbArg!=0){
         fprintf(stderr, "%s ", $1);

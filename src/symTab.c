@@ -221,7 +221,12 @@ struct symbole* addST_fun(char *id, struct fundesc* fundesc)
     strncpy(s->u.id, id, strlen(id));
     s->u.id[strlen(id)]='\0';
     //printf("|new fun : %s %s\n", s->u.id, id);*/
-    s->type.desc=fundesc;
+    if (fundesc)
+        s->type.desc=fundesc;
+    else {
+        s->type.desc=malloc(sizeof (struct fundesc));
+        s->type.desc->nbArg=-1;
+    }
     s->table = symTab;
     //s->type.desc->ret=ret;
     return s;
