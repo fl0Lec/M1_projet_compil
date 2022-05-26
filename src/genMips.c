@@ -398,7 +398,7 @@ void genCall(struct code3add instr, FILE* out)
                 fprintf(out, "sw $t0 %s\n", param.arg1->u.id);
             else
                 fprintf(out, "sw $t0, %d($sp)\n", param.arg1->location);
-            fprintf(out, "sw $v0 $t0\n");
+            fprintf(out, "move $v0 $t0\n");
         }
         else if (param.arg1->table->prev == NULL)
             fprintf(out, "sw $v0 %s\n", param.arg1->u.id);

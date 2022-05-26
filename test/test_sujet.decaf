@@ -16,12 +16,13 @@ class Program
                 WriteString("Entrez la valeur");
             WriteInt(i+1);
             WriteString(":\n");
-            ReadInt(valeurs[i]);
+            //ReadInt(valeurs[i]);
             test = valeurs[i] > 0;
             // vérification
             if (!test)
             {
                 WriteString("Les valeurs doivent être strictement positives !\n");
+                WriteInt(valeurs[i]);
                 return false;
             }
         }
@@ -41,7 +42,7 @@ class Program
     {
         int nombre;
         WriteString("Nombre de valeurs :");
-        ReadInt(nombre);
+        //ReadInt(nombre);
         if (lecture_valeurs(nombre))
         {
             WriteString("Moyenne = ");

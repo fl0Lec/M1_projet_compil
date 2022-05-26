@@ -1,27 +1,22 @@
+**Antoine DUMOULIN, Antoine PIERRE, Florent LECOULTRE**
+
 # Capacités du compilateur
 
+## Tests
+
+Le fichier `test.sh` compile tout les fichiers de test du dossier 
+`test/` les fichiers de sorties sont redirigés dans `out/`.
+Les fichiers .cerr contiennent les tables de symboles, .asm le code mips et .out la sortie du code executé.
 
 
-## Analyse lexicale (FLEX)
 
-Notre analyseur lexical traite tout ce que le sujet nous demande de faire, c'est-à-dire :
+## Analyse lexicale (FLEX) & Analyse syntaxique (YACC)
 
-- les mots clés (pour les structures de contrôle, le typage, etc..)
-- les opérations arithmétiques et logiques
-- les commentaires
-- les chaînes de caractères
+Nos analyseurs lexical et syntaxique traitent tout ce dont le sujet nous demande de faire.
 
 L'analyseur lexical se trouve dans `compilateur.lex`.
 
-
-
-## Analyse syntaxique (YACC)
-
-L'analyseur syntaxique gère les opérations arithmétiques ainsi que les opérations de contrôle.
-
-En revanche il ne gère pas les tableaux. On pensait que cela rajouterait  de la complexité pour construire notre compilateur et une volonté de vouloir le créer de façon incrémentale, nous avons considéré que les tableaux n'étaient pas une priorité. Suite à des contraintes de temps il n'était plus envisageable d'implémenter la gestion des tableaux.
-
-Notre analyseur syntaxique se trouve dans `compilateur.y`.
+L'analyseur syntaxique se trouve dans `compilateur.y`.
 
 
 
@@ -34,20 +29,21 @@ Chaque case du tableau correspond à une ligne de code.
 Chaque ligne est représenté sous forme d'une structure de donnée **code3add**.
 
 
-
 #### opérations arithmétiques
 
 Les opérateurs arithmétiques sont :
-`{load, loadimm, store, add, sub, mul, divi}`
+`{load, loadTab loadimm, store, add, sub, mul, divi}`
 
 Les opérations load et loadimm n'ont finalement pas trouvé leurs places dans la génération de code. 
-En effet, la traduction du code en mips s'occupe de load les arguments.
+En effet, la traduction du code en mips s'occupe de load les variables.
 
 Les arguments peuvent être des constantes ou des variables (globales ou locales).
 
 **load :** dst := arg1
 
 **loadimm :** dst := val 
+
+**loadTab:** dst := &arg1[arg2]
 
 **store :** dst := arg1
 
@@ -91,7 +87,6 @@ les opérateurs de controle sont :
 **call :** call arg1 -> dst : (dans dst seulement si dans expression et fonction a valeur de retour)
 
 
-
 Toutes les fonctions liées au langage intermédiaire se trouvent dans `genCode.c`.
 
 On utilise deux structures pour générer du code intermédiaire : 
@@ -118,10 +113,45 @@ La structure `symbole` y est présente. Elle contient pour chaque symbole :
 Dès que la totalité du code decaf a été traduite en code intermédiaire, il traduit en mips dans le fichier `genMips.c`. 
 Chaque type d'opération de code à 3 adresses est traduit par une fonction.
 
-Le sujet nous demande d'implémenter les fonctions : "WriteString", "WriteInt", "ReadInt" et "WriteBool". Elles sont générés manuellement dans la fonction `void genIOFunctions(FILE* out)` qui s'occupe des fonctions d'entrée et sorties. La fonction "WriteBool" n'a pas été implémenté manuellement par manque de courage, il suffit de la générer en code intermédiaire.
+Le sujet nous demande d'implémenter les fonctions : "WriteString", "WriteInt", "ReadInt" et "WriteBool". Elles sont générés manuellement dans la fonction `void genIOFunctions(FILE* out)` qui s'occupe des fonctions d'entrée et sorties.
 
 
 
 ## Gestion des options
 
 On lit tout les arguments entrés lors de l'éxécution du programme et si un argument est reconnu comme une option existante, on réalise l'action qui lui est associée.
+
+- tos : affiche la table des symboles
+- version : affiche les membres de l'équipe
+- o [fichier] : fichier de sortie
+
+
+
+## limites du compilateur
+
+Avec une volonté de vouloir développer de manière incrémentale, nous avons considéré que les tableaux n'étaient pas une priorité. Suite à des contraintes de temps la gestion des tableaux est restée à un état primitif où il vaut mieux les utiliser de façon minimaliste pour éviter des bugs.
+
+Les booléens ne sont également pas stables, notamment en paramètre ou en retour de fonction.
+Néanmoins les opérations de controles fonctionnent.
+
+La fonction "WriteBool" n'a pas été implémentée par manque de courage, il suffira de l'implémenter en decaf tel que :
+
+```
+WriteBool(boolean b) {
+    if (b) {
+        WriteString("true");
+    }
+    else {
+        WriteString("false");
+    }
+}
+```
+
+
+
+
+
+
+
+
+

@@ -76,8 +76,8 @@ int main(int argc, char** argv)
 
     if (afficher_table)
         afficheAllST();
-    printf("\n");
-    afficheGenCode();
+    //printf("\n");
+    //afficheGenCode();
     genMips(yyout);
     
     depilerST();

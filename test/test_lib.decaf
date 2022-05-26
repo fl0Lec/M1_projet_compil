@@ -2,7 +2,7 @@ class Program {
     void main(){
         int i;
         WriteString("rentrez \n");
-        ReadInt(i);
+        //ReadInt(i);
         WriteString("\n");
         //WriteString("vous avez rentrez : ");
         WriteInt(i);
